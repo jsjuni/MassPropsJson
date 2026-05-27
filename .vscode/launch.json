@@ -1,0 +1,35 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "julia",
+            "request": "launch",
+            "name": "Julia: Launch MassPropsJson",
+            "program": "${workspaceFolder}/src/MassPropsJson.jl",
+            "stopOnEntry": false,
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "--id", "child",
+                "--pid", "parent",
+                "--table", "${workspaceFolder}/data/mp_table.tsv",
+                "--edgelist", "${workspaceFolder}/data/mp_edges.tsv",
+                "--output", "${workspaceFolder}/build/wp.json"
+            ],
+        },
+                {
+            "type": "julia",
+            "request": "launch",
+            "name": "Julia: Launch BuildModel",
+            "program": "${workspaceFolder}/src/BuildModel.jl",
+            "stopOnEntry": false,
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "--input", "${workspaceFolder}/build/wp.json",
+                "--limit", "20"
+            ],
+        }
+    ]
+}
