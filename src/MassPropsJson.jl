@@ -103,6 +103,7 @@ module Main
             if haskey(wpd, supp)
                 wp = wpd[supp]
                 wp["hasPOIconv"] = row["POIconv"]
+                wp["isPointMass"] = false
                 if !ismissing(row["mass"])
                     wp["hasValues"] = [
                        Dict("mass" => string(row["mass"])),

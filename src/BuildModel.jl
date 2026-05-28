@@ -13,6 +13,9 @@ const CHARACTERIZES = "http://imce.jpl.nasa.gov/foundation/analysis#characterize
 const WORK_PACKAGE = "http://imce.jpl.nasa.gov/foundation/project#WorkPackage"
 const COMPONENT = "http://imce.jpl.nasa.gov/foundation/mission#Component"
 const SUPPLIES = "http://imce.jpl.nasa.gov/foundation/project#supplies"
+const HAS_NUMBER = "<http://studioj.us/metrology#hasNumber>"
+const HAS_POI_CONVENTION = "<http://studioj.us/metrology#hasPoiConvention>"
+const IS_POINT_MASS = "<http://studioj.us/metrology#isPointMass>"
 
 function parse_commandline()
     s = ArgParseSettings()
@@ -130,6 +133,10 @@ function add_annotation(ontologyIri, subjectIri, predicateIri, object)
     )
 end
 
+function xsd_double(value)
+    "$value"
+end
+
 function (@main)(ARGS)
 
     quantity_map = Dict(
@@ -176,10 +183,6 @@ function (@main)(ARGS)
         end
         wp = String(v.first)
         wpd = v.second
-
-        if length(wpd["authorizes"]) == 0
-            continue
-        end
 
         operations = []
 
@@ -283,6 +286,8 @@ function (@main)(ARGS)
                 if (cont_comp_iri != comp_iri)
                     push!(operations, add_assertion(cd_iri, comp_iri, IS_CONTAINED_IN, cont_comp_iri))
                 end
+                push!(operations, add_assertion(cd_iri, comp_iri, HAS_POI_CONVENTION, wpd["hasPOIconv"]))
+                push!(operations, add_assertion(cd_iri, comp_iri, IS_POINT_MASS, wpd["isPointMass"]))
 
                 # add supplies relation from work package to component
 
@@ -301,18 +306,20 @@ function (@main)(ARGS)
 
             end
 
-            for (quantity, kind) in quantity_map
-                q_name = wpd["supplies"] * "_" * quantity
-                qv_name =q_name * "_value"
-                q_iri = cont_comp_qd_ns * q_name
-                qv_iri = qvd_ns * qv_name
-                type = replace(kind, "Quantity" => "Value")
-                push!(operations, create_instance(qvd_iri, qv_name))
-                push!(operations, add_annotation(qvd_iri, qv_iri, RDFS_LABEL, quantity))
-                push!(operations, add_assertion(qvd_iri, qv_iri, RDF_TYPE, "http://studioj.us/metrology#$type"))
-                push!(operations, add_assertion(qvd_iri, qv_iri, CHARACTERIZES, q_iri))
-           end
+        end
 
+        # add quantity values
+
+        for (quantity, kind) in quantity_map
+            q_name = wpd["supplies"] * "_" * quantity
+            qv_name = q_name * "_value"
+            q_iri = cont_comp_qd_ns * q_name
+            qv_iri = qvd_ns * qv_name
+            type = replace(kind, "Quantity" => "Value")
+            push!(operations, create_instance(qvd_iri, qv_name))
+            push!(operations, add_annotation(qvd_iri, qv_iri, RDFS_LABEL, quantity))
+            push!(operations, add_assertion(qvd_iri, qv_iri, RDF_TYPE, "http://studioj.us/metrology#$type"))
+            push!(operations, add_assertion(qvd_iri, qv_iri, CHARACTERIZES, q_iri))
         end
 
         if args["deferred"]
@@ -322,7 +329,7 @@ function (@main)(ARGS)
             t1 = time()
             update(server, operations)
             t2 = time()
-            println("Updated server for ", wp, " ", length(operations), " operations in ", round(t2 - t1, digits=2), " s")
+            println("Updated server for ", wp, " (", i, ") ", length(operations), " operations in ", round(t2 - t1, digits=2), " s")
             sleep(1)
             push!(updates, operations)
         end
@@ -335,7 +342,7 @@ function (@main)(ARGS)
         t2 = time()
         println("Updated server with ", length(deferred), " operations in ", round(t2 - t1, digits=2), " s")
         open("/tmp/operations.json", "w") do file
-           JSON3.pretty(file, deferred)
+            JSON3.pretty(file, deferred)
         end
     end
 
