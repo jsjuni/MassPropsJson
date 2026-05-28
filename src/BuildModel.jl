@@ -221,10 +221,7 @@ function (@main)(ARGS)
         push!(operations, add_authorization(qd_iri, authorizer))
         push!(operations, add_authorization(qvd_iri, authorizer))
 
-        # add imports -- coupld use oml code auto-import
-
-        # push!(operations, add_import(wpd_ns, cd_ns))
-        # push!(operations, add_import(qd_ns, cd_ns))
+        # add imports
 
         if wp != authorizer
             push!(operations, add_import(qvd_ns, cont_comp_qd_ns))
@@ -259,7 +256,10 @@ function (@main)(ARGS)
             push!(operations, add_authorization(cd_iri, authorizer))
             push!(operations, add_authorization(wpd_iri, authorizer))
 
-            # component descriptions (except for the top) refer to their containing component
+            # add imports
+
+            push!(operations, add_import(wpd_ns, cd_ns))
+            push!(operations, add_import(qd_ns, cd_ns))
 
             if wp != authorizer
                 push!(operations, add_import(cd_ns, cont_comp_d_ns))
@@ -321,7 +321,7 @@ function (@main)(ARGS)
         update(server, deferred)
         t2 = time()
         println("Updated server with ", length(deferred), " operations in ", round(t2 - t1, digits=2), " s")
-        open("operations.json", "w") do file
+        open("/tmp/operations.json", "w") do file
            JSON3.pretty(file, deferred)
         end
     end
