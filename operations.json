@@ -32,6 +32,16 @@
         }
     },
     {
+        "deleteOntology": {
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/C#"
+        }
+    },
+    {
+        "deleteOntology": {
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/WP#"
+        }
+    },
+    {
         "createOntology": {
             "ontologyPrefix": "WP.1_C",
             "ontologyNamespace": "http://studioj.us/mass-props-oml/WP.1/C#",

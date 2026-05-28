@@ -233,8 +233,8 @@ function (@main)(ARGS)
 
             # delete existing descriptions
 
-            # push!(operations, delete_description(cd_ns))
-            # push!(operations, delete_description(wpd_ns))
+            push!(operations, delete_description(cd_ns))
+            push!(operations, delete_description(wpd_ns))
 
             # create descriptions
 
