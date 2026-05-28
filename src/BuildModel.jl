@@ -167,6 +167,7 @@ function (@main)(ARGS)
     end
 
     deferred = []
+    updates = []
 
     for (i, v) in enumerate(vl)
         if args["limit"] > 0 && i > args["limit"]
@@ -223,9 +224,7 @@ function (@main)(ARGS)
 
         # add imports
 
-        if wp != authorizer
-            push!(operations, add_import(qvd_ns, cont_comp_qd_ns))
-        end
+        push!(operations, add_import(qvd_ns, cont_comp_qd_ns))
 
         if length(wpd["authorizes"]) > 0
 
@@ -289,11 +288,11 @@ function (@main)(ARGS)
 
                 push!(operations, add_assertion(wpd_iri, wp_iri, SUPPLIES, comp_iri))
 
-                # create mass property quantities
+                # create mass property quantities and quantity values
 
                 for (quantity, kind) in quantity_map
                     q_name = comp * "_" * quantity
-                    q_iri = qd_ns * String(q_name)
+                    q_iri = qd_ns * q_name
                     push!(operations, create_instance(qd_iri, q_name))
                     push!(operations, add_annotation(qd_iri, q_iri, RDFS_LABEL, quantity))
                     push!(operations, add_assertion(qd_iri, q_iri, RDF_TYPE, "http://studioj.us/metrology#$kind"))
@@ -301,6 +300,22 @@ function (@main)(ARGS)
                 end
 
             end
+
+            for (quantity, kind) in quantity_map
+                q_name = wpd["supplies"] * "_" * quantity
+                qv_name =q_name * "_value"
+                value = quantity * "_value"
+                q_iri = cont_comp_qd_ns * q_name
+                println("q_iri", " ", q_iri)
+                qv_iri = qvd_ns * qv_name
+                type = replace(kind, "Quantity" => "Value")
+                push!(operations, create_instance(qvd_iri, qv_name))
+                push!(operations, add_annotation(qvd_iri, qv_iri, RDFS_LABEL, value))
+                push!(operations, add_assertion(qvd_iri, qv_iri, RDF_TYPE, "http://studioj.us/metrology#$type"))
+                push!(operations, add_assertion(qvd_iri, qv_iri, CHARACTERIZES, q_iri))
+                # push!(operations, add_annotation(qvd_iri, qv_iri, RDFS_LABEL, String(q_iri)))
+           end
+
         end
 
         if args["deferred"]
@@ -312,6 +327,7 @@ function (@main)(ARGS)
             t2 = time()
             println("Updated server for ", wp, " ", length(operations), " operations in ", round(t2 - t1, digits=2), " s")
             sleep(1)
+            push!(updates, operations)
         end
 
     end
@@ -324,6 +340,10 @@ function (@main)(ARGS)
         open("/tmp/operations.json", "w") do file
            JSON3.pretty(file, deferred)
         end
+    end
+
+    open("/tmp/updates.json", "w") do file
+        JSON3.pretty(file, updates)
     end
 
     exit(0)
