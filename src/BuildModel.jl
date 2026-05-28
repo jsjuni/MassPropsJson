@@ -304,16 +304,13 @@ function (@main)(ARGS)
             for (quantity, kind) in quantity_map
                 q_name = wpd["supplies"] * "_" * quantity
                 qv_name =q_name * "_value"
-                value = quantity * "_value"
                 q_iri = cont_comp_qd_ns * q_name
-                println("q_iri", " ", q_iri)
                 qv_iri = qvd_ns * qv_name
                 type = replace(kind, "Quantity" => "Value")
                 push!(operations, create_instance(qvd_iri, qv_name))
-                push!(operations, add_annotation(qvd_iri, qv_iri, RDFS_LABEL, value))
+                push!(operations, add_annotation(qvd_iri, qv_iri, RDFS_LABEL, quantity))
                 push!(operations, add_assertion(qvd_iri, qv_iri, RDF_TYPE, "http://studioj.us/metrology#$type"))
                 push!(operations, add_assertion(qvd_iri, qv_iri, CHARACTERIZES, q_iri))
-                # push!(operations, add_annotation(qvd_iri, qv_iri, RDFS_LABEL, String(q_iri)))
            end
 
         end
