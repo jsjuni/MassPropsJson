@@ -28,7 +28,7 @@
             "cwd": "${workspaceFolder}",
             "args": [
                 "--input", "${workspaceFolder}/build/wp.json",
-                "--limit", "1",
+                "--limit", "2",
                 "--deferred"
             ],
         }

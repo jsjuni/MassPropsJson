@@ -194,6 +194,16 @@ function (@main)(ARGS)
         qvd_ns = qvd_iri * args["separator"]
         qvd_prefix = wp * "_QV"
 
+        # parent iris and namespaces
+
+        parent_wp_iri_frag = args["namespace-base"] * "/" * wpd["isAuthorizedBy"]
+
+        cont_comp_d_iri = parent_wp_iri_frag * "/C"
+        cont_comp_d_ns = cont_comp_d_iri * args["separator"]
+
+        cont_comp_qd_iri = parent_wp_iri_frag * "/Q"
+        cont_comp_qd_ns = cont_comp_qd_iri * args["separator"]
+
         authorizer = wpd["isAuthorizedBy"]
 
         # delete existing descriptions
@@ -215,7 +225,10 @@ function (@main)(ARGS)
 
         # push!(operations, add_import(wpd_ns, cd_ns))
         # push!(operations, add_import(qd_ns, cd_ns))
-        # push!(operations, add_import(qvd_ns, qd_ns))
+
+        if wp != authorizer
+            push!(operations, add_import(qvd_ns, cont_comp_qd_ns))
+        end
 
         if length(wpd["authorizes"]) > 0
 
@@ -248,10 +261,7 @@ function (@main)(ARGS)
 
             # component descriptions (except for the top) refer to their containing component
 
-            cont_comp_d_iri = args["namespace-base"] * "/" * wpd["isAuthorizedBy"] * "/C"
-            cont_comp_d_ns = cont_comp_d_iri * args["separator"]
-
-            if cd_ns != cont_comp_d_ns
+            if wp != authorizer
                 push!(operations, add_import(cd_ns, cont_comp_d_ns))
             end
 
