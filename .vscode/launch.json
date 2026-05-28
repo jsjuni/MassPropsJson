@@ -19,7 +19,7 @@
                 "--output", "${workspaceFolder}/build/wp.json"
             ],
         },
-                {
+        {
             "type": "julia",
             "request": "launch",
             "name": "Julia: Launch BuildModel",
@@ -28,7 +28,8 @@
             "cwd": "${workspaceFolder}",
             "args": [
                 "--input", "${workspaceFolder}/build/wp.json",
-                "--limit", "20"
+                "--limit", "1",
+                "--deferred"
             ],
         }
     ]

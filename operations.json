@@ -1,0 +1,2038 @@
+[
+    {
+        "createOntology": {
+            "ontologyPrefix": "WP.1_Q",
+            "ontologyNamespace": "http://studioj.us/mass-props-oml/WP.1/Q#",
+            "targetFolder": "src/model/oml",
+            "ontologyKind": "description"
+        }
+    },
+    {
+        "createOntology": {
+            "ontologyPrefix": "WP.1_QV",
+            "ontologyNamespace": "http://studioj.us/mass-props-oml/WP.1/QV#",
+            "targetFolder": "src/model/oml",
+            "ontologyKind": "description"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "predicateIri": "http://purl.org/dc/elements/1.1/creator",
+            "object": "WP.1",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/QV",
+            "predicateIri": "http://purl.org/dc/elements/1.1/creator",
+            "object": "WP.1",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/QV"
+        }
+    },
+    {
+        "createOntology": {
+            "ontologyPrefix": "WP.1_C",
+            "ontologyNamespace": "http://studioj.us/mass-props-oml/WP.1/C#",
+            "targetFolder": "src/model/oml",
+            "ontologyKind": "description"
+        }
+    },
+    {
+        "createOntology": {
+            "ontologyPrefix": "WP.1_WP",
+            "ontologyNamespace": "http://studioj.us/mass-props-oml/WP.1/WP#",
+            "targetFolder": "src/model/oml",
+            "ontologyKind": "description"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/C",
+            "predicateIri": "http://purl.org/dc/elements/1.1/creator",
+            "object": "WP.1",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/C"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/WP",
+            "predicateIri": "http://purl.org/dc/elements/1.1/creator",
+            "object": "WP.1",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/WP"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "WP.1",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/WP"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/WP#WP.1",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/WP",
+            "object": "http://imce.jpl.nasa.gov/foundation/project#WorkPackage"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/WP#WP.1",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/base#hasCanonicalName",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/WP",
+            "object": "System 1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/C"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/C#C.1",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/C",
+            "object": "http://imce.jpl.nasa.gov/foundation/mission#Component"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/C#C.1",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/base#hasCanonicalName",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/C",
+            "object": "System 1"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/WP#WP.1",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/project#supplies",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/WP",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_sigma_Izz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Izz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Izz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Izz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Izz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_sigma_Iyz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Iyz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Iyz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Iyz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Iyz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_Ixx",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Ixx",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Ixx",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Ixx",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Ixx",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_Cz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Cz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Cz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Cz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Cz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_sigma_Cy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Cy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Cy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Cy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Cy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_sigma_Iyy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Iyy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Iyy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Iyy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Iyy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_sigma_Ixx",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Ixx",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Ixx",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Ixx",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Ixx",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_Iyz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Iyz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Iyz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Iyz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Iyz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_sigma_mass",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_mass",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_mass",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_mass",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_mass",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_Iyy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Iyy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Iyy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Iyy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Iyy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_sigma_Ixz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Ixz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Ixz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Ixz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Ixz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_Cy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Cy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Cy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Cy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Cy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_sigma_Cz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Cz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Cz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Cz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Cz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_mass",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_mass",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "mass",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_mass",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_mass",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_Cx",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Cx",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Cx",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Cx",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Cx",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_sigma_Cx",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Cx",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Cx",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Cx",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Cx",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_sigma_Ixy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Ixy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Ixy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Ixy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_sigma_Ixy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_Izz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Izz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Izz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Izz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Izz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_Ixy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Ixy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Ixy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Ixy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Ixy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1_Ixz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Ixz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Ixz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Ixz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1_Ixz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "WP.1.2",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/WP"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/WP#WP.1.2",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/WP",
+            "object": "http://imce.jpl.nasa.gov/foundation/project#WorkPackage"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/WP#WP.1.2",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/base#hasCanonicalName",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/WP",
+            "object": "Segment 2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/C"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/C",
+            "object": "http://imce.jpl.nasa.gov/foundation/mission#Component"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/base#hasCanonicalName",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/C",
+            "object": "Segment 2"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/base#isContainedIn",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/C",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/WP#WP.1.2",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/project#supplies",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/WP",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_sigma_Izz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Izz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Izz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Izz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Izz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_sigma_Iyz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Iyz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Iyz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Iyz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Iyz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_Ixx",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Ixx",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Ixx",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Ixx",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Ixx",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_Cz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Cz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Cz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Cz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Cz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_sigma_Cy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Cy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Cy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Cy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Cy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_sigma_Iyy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Iyy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Iyy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Iyy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Iyy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_sigma_Ixx",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Ixx",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Ixx",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Ixx",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Ixx",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_Iyz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Iyz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Iyz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Iyz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Iyz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_sigma_mass",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_mass",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_mass",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_mass",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_mass",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_Iyy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Iyy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Iyy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Iyy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Iyy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_sigma_Ixz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Ixz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Ixz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Ixz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Ixz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_Cy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Cy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Cy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Cy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Cy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_sigma_Cz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Cz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Cz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Cz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Cz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_mass",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_mass",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "mass",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_mass",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_mass",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_Cx",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Cx",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Cx",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Cx",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Cx",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_sigma_Cx",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Cx",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Cx",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Cx",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Cx",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_sigma_Ixy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Ixy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Ixy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Ixy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_sigma_Ixy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_Izz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Izz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Izz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Izz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Izz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_Ixy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Ixy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Ixy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Ixy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Ixy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.2_Ixz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Ixz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Ixz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Ixz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.2_Ixz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.2"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "WP.1.1",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/WP"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/WP#WP.1.1",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/WP",
+            "object": "http://imce.jpl.nasa.gov/foundation/project#WorkPackage"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/WP#WP.1.1",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/base#hasCanonicalName",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/WP",
+            "object": "Segment 1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/C"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/C",
+            "object": "http://imce.jpl.nasa.gov/foundation/mission#Component"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/base#hasCanonicalName",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/C",
+            "object": "Segment 1"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/base#isContainedIn",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/C",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/WP#WP.1.1",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/project#supplies",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/WP",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_sigma_Izz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Izz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Izz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Izz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Izz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_sigma_Iyz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Iyz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Iyz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Iyz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Iyz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_Ixx",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Ixx",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Ixx",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Ixx",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Ixx",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_Cz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Cz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Cz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Cz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Cz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_sigma_Cy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Cy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Cy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Cy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Cy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_sigma_Iyy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Iyy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Iyy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Iyy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Iyy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_sigma_Ixx",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Ixx",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Ixx",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Ixx",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Ixx",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_Iyz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Iyz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Iyz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Iyz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Iyz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_sigma_mass",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_mass",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_mass",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_mass",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_mass",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_Iyy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Iyy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Iyy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Iyy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Iyy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_sigma_Ixz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Ixz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Ixz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Ixz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Ixz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_Cy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Cy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Cy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Cy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Cy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_sigma_Cz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Cz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Cz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Cz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Cz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_mass",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_mass",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "mass",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_mass",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_mass",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_Cx",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Cx",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Cx",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Cx",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Cx",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_sigma_Cx",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Cx",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Cx",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Cx",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#CenterOfMassQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Cx",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_sigma_Ixy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Ixy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "sigma_Ixy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Ixy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_sigma_Ixy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_Izz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Izz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Izz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Izz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#MomentOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Izz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_Ixy",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Ixy",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Ixy",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Ixy",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Ixy",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    },
+    {
+        "createInstance": {
+            "instanceName": "C.1.1_Ixz",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAnnotation": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Ixz",
+            "predicateIri": "http://www.w3.org/2000/01/rdf-schema#label",
+            "object": "Ixz",
+            "ontologyIri": "http://studioj.us/mass-props-oml/WP.1/Q"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Ixz",
+            "predicateIri": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/metrology#ProductOfInertiaQuantity"
+        }
+    },
+    {
+        "addAssertion": {
+            "subjectIri": "http://studioj.us/mass-props-oml/WP.1/Q#C.1.1_Ixz",
+            "predicateIri": "http://imce.jpl.nasa.gov/foundation/analysis#characterizes",
+            "descriptionIri": "http://studioj.us/mass-props-oml/WP.1/Q",
+            "object": "http://studioj.us/mass-props-oml/WP.1/C#C.1.1"
+        }
+    }
+]
