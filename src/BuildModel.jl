@@ -186,12 +186,6 @@ function (@main)(ARGS)
 
         operations = []
 
-        # description for quantities
-
-        qd_iri = args["namespace-base"] * "/" * wp * "/Q"
-        qd_ns = qd_iri * args["separator"]
-        qd_prefix = wp * "_Q"
-
         # description for quantity values
 
         qvd_iri = args["namespace-base"] * "/" * wp * "/QV"
@@ -217,19 +211,19 @@ function (@main)(ARGS)
 
         # create descriptions
 
-        push!(operations, add_description(qd_ns, qd_prefix, args["path-base"]))
+        # description for quantities
+
+        qd_iri = args["namespace-base"] * "/" * wp * "/Q"
+        qd_ns = qd_iri * args["separator"]
+        qd_prefix = wp * "_Q"
+
         push!(operations, add_description(qvd_ns, qvd_prefix, args["path-base"]))
 
         # add authorization annotations to descriptions
 
-        push!(operations, add_authorization(qd_iri, authorizer))
         push!(operations, add_authorization(qvd_iri, authorizer))
 
-        # add imports
-
-        push!(operations, add_import(qvd_ns, cont_comp_qd_ns))
-
-        if length(wpd["authorizes"]) > 0
+       if length(wpd["authorizes"]) > 0
 
             # description for components
 
@@ -245,23 +239,26 @@ function (@main)(ARGS)
 
             # delete existing descriptions
 
-            push!(operations, delete_description(cd_ns))
-            push!(operations, delete_description(wpd_ns))
+            # push!(operations, delete_description(cd_ns))
+            # push!(operations, delete_description(wpd_ns))
 
             # create descriptions
 
             push!(operations, add_description(cd_ns, cd_prefix, args["path-base"]))
             push!(operations, add_description(wpd_ns, wpd_prefix, args["path-base"]))
+            push!(operations, add_description(qd_ns, qd_prefix, args["path-base"]))
 
             # add authorization annotations to descriptions
 
             push!(operations, add_authorization(cd_iri, authorizer))
             push!(operations, add_authorization(wpd_iri, authorizer))
+            push!(operations, add_authorization(qd_iri, authorizer))
 
             # add imports
 
             push!(operations, add_import(wpd_ns, cd_ns))
             push!(operations, add_import(qd_ns, cd_ns))
+            push!(operations, add_import(qvd_ns, cont_comp_qd_ns))
 
             if wp != authorizer
                 push!(operations, add_import(cd_ns, cont_comp_d_ns))
