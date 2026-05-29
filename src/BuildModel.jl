@@ -63,7 +63,7 @@ function is_alive(server)
 end
 
 function update(server, operations)
-    body = Dict("operations" => operations)
+    body = Dict("operations" => operations, "deferDiagnostics" => true)
     resp = HTTP.post("$server/v0/update", headers=Dict("Content-Type" => "application/json"), body=JSON3.write(body))
     # println("Response: ", resp.status, " - ", String(resp.body))
     return resp.status == 200
@@ -177,6 +177,8 @@ function (@main)(ARGS)
 
     args = parse_commandline()
 
+    start_time = time()
+
     vl = JSON3.read(args["input"])
 
     server = args["server"]
@@ -234,10 +236,6 @@ function (@main)(ARGS)
 
         push!(operations, add_description(qvd_ns, qvd_prefix, args["path-base"]))
 
-        # add authorization annotations to descriptions
-
-        # push!(operations, add_authorization(qvd_iri, parent_wp_iri))
-
         if length(wpd["authorizes"]) > 0
 
             # description for components
@@ -263,20 +261,14 @@ function (@main)(ARGS)
             push!(operations, add_description(wpd_ns, wpd_prefix, args["path-base"]))
             push!(operations, add_description(qd_ns, qd_prefix, args["path-base"]))
 
-            # add authorization annotations to descriptions
-
-            # push!(operations, add_authorization(cd_iri, parent_wp_iri))
-            # push!(operations, add_authorization(wpd_iri, parent_wp_iri))
-            # push!(operations, add_authorization(qd_iri, parent_wp_iri))
-
             # add imports
 
-            push!(operations, add_import(wpd_ns, cd_ns))
-            push!(operations, add_import(qd_ns, cd_ns))
-            push!(operations, add_import(qvd_ns, cont_comp_qd_ns))
+            # push!(operations, add_import(wpd_ns, cd_ns))
+            # push!(operations, add_import(qd_ns, cd_ns))
+            # push!(operations, add_import(qvd_ns, cont_comp_qd_ns))
 
             if wp != authorizer
-                push!(operations, add_import(cd_ns, cont_comp_d_ns))
+                # push!(operations, add_import(cd_ns, cont_comp_d_ns))
             end
 
             for (wp, comp) in wpd["authorizes"]
@@ -320,6 +312,12 @@ function (@main)(ARGS)
 
             end
 
+            # add authorization annotations to descriptions
+
+            push!(operations, add_authorization(cd_iri, parent_wp_iri))
+            push!(operations, add_authorization(wpd_iri, parent_wp_iri))
+            push!(operations, add_authorization(qd_iri, parent_wp_iri))
+
         end
 
         # add quantity values
@@ -340,8 +338,11 @@ function (@main)(ARGS)
                 push!(operations, add_assertion(qvd_iri, qv_iri, HAS_NUMBER, Dict("\$type" => "DoubleLiteral", "value" => value)))
                 push!(operations, add_assertion(qvd_iri, qv_iri, HAS_UNIT, unit_map[kind]))
              end
-
         end
+
+        # add authorization annotations to descriptions
+
+        push!(operations, add_authorization(qvd_iri, parent_wp_iri))
 
         if args["deferred"]
             push!(deferred, operations...)
@@ -351,7 +352,7 @@ function (@main)(ARGS)
             update(server, operations)
             t2 = time()
             println("Updated server for ", wp, " (", i, ") ", length(operations), " operations in ", round(t2 - t1, digits=2), " s")
-            sleep(1)
+            # sleep(1)
             push!(updates, operations)
         end
 
@@ -370,6 +371,9 @@ function (@main)(ARGS)
     open("/tmp/updates.json", "w") do file
         JSON3.pretty(file, updates)
     end
+
+    end_time = time()
+    println("Updated server with ", length(deferred), " operations in ", round(end_time - start_time, digits=2), " s")
 
     exit(0)
 end
