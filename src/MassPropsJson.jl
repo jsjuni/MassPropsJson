@@ -115,29 +115,29 @@ module Main
                 wp["hasPOIconv"] = row["POIconv"]
                 wp["isPointMass"] = false
                 if !ismissing(row["mass"])
-                    wp["hasValues"] = [
-                       Dict("mass" => string(row["mass"])),
-                        Dict("Cx" => string(row["Cx"])),
-                        Dict("Cy" => string(row["Cy"])),
-                        Dict("Cz" => string(row["Cz"])),
-                        Dict("Ixx" => string(row["Ixx"])),
-                        Dict("Iyy" => string(row["Iyy"])),
-                        Dict("Izz" => string(row["Izz"])),
-                        Dict("Ixy" => string(row["Ixy"])),
-                        Dict("Ixz" => string(row["Ixz"])),
-                        Dict("Iyz" => string(row["Iyz"])),
-                        Dict("Ipoint" => row["Ipoint"]),
-                        Dict("sigma_mass" => string(row["sigma_mass"])),
-                        Dict("sigma_Cx" => string(row["sigma_Cx"])),
-                        Dict("sigma_Cy" => string(row["sigma_Cy"])),
-                        Dict("sigma_Cz" => string(row["sigma_Cz"])),
-                        Dict("sigma_Ixx" => string(row["sigma_Ixx"])),
-                        Dict("sigma_Iyy" => string(row["sigma_Iyy"])),
-                        Dict("sigma_Izz" => string(row["sigma_Izz"])),
-                        Dict("sigma_Ixy" => string(row["sigma_Ixy"])),
-                        Dict("sigma_Ixz" => string(row["sigma_Ixz"])),
-                        Dict("sigma_Iyz" => string(row["sigma_Iyz"]))
-                    ]
+                    wp["hasValues"] = Dict(
+                        "mass" => string(row["mass"]),
+                        "Cx" => string(row["Cx"]),
+                        "Cy" => string(row["Cy"]),
+                        "Cz" => string(row["Cz"]),
+                        "Ixx" => string(row["Ixx"]),
+                        "Iyy" => string(row["Iyy"]),
+                        "Izz" => string(row["Izz"]),
+                        "Ixy" => string(row["Ixy"]),
+                        "Ixz" => string(row["Ixz"]),
+                        "Iyz" => string(row["Iyz"]),
+                        "Ipoint" => row["Ipoint"],
+                        "sigma_mass" => string(row["sigma_mass"]),
+                        "sigma_Cx" => string(row["sigma_Cx"]),
+                        "sigma_Cy" => string(row["sigma_Cy"]),
+                        "sigma_Cz" => string(row["sigma_Cz"]),
+                        "sigma_Ixx" => string(row["sigma_Ixx"]),
+                        "sigma_Iyy" => string(row["sigma_Iyy"]),
+                        "sigma_Izz" => string(row["sigma_Izz"]),
+                        "sigma_Ixy" => string(row["sigma_Ixy"]),
+                        "sigma_Ixz" => string(row["sigma_Ixz"]),
+                        "sigma_Iyz" => string(row["sigma_Iyz"])
+                    )
                 end
             end
             p_supp = supplier(parent(c, tree))
