@@ -322,6 +322,10 @@ function (@main)(ARGS)
             push!(operations, add_assertion(qvd_iri, qv_iri, CHARACTERIZES, q_iri))
         end
 
+        open("/tmp/body.json", "w") do file
+            JSON3.pretty(file, operations)
+        end
+
         if args["deferred"]
             push!(deferred, operations...)
             println("Deferred update for ", wp, " with ", length(operations), " operations")

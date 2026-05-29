@@ -32,6 +32,10 @@ module Main
                 help = "Output JSON file (default: output.json)"
                 arg_type = String
                 default = ""
+            "--reject"
+                help = "Pattern to reject identifiers (default: r\"^\$\")"
+                arg_type = String
+                default = "^\$"
         end
         return parse_args(s)
     end
@@ -86,6 +90,9 @@ module Main
         wpd = OrderedCollections.OrderedDict{String, Dict{String, Any}}()
 
         for c in cl
+            if occursin(Regex(args["reject"]), c)
+                continue
+            end
             cust = customer(c, tree)
             supp = supplier(c)
             if !haskey(wpd, supp)
@@ -99,6 +106,9 @@ module Main
 
         for row in eachrow(table)
             c = row["id"]
+            if occursin(Regex(args["reject"]), c)
+                continue
+            end
             supp = supplier(c)
             if haskey(wpd, supp)
                 wp = wpd[supp]
