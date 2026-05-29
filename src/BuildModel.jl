@@ -14,8 +14,14 @@ const WORK_PACKAGE = "http://imce.jpl.nasa.gov/foundation/project#WorkPackage"
 const COMPONENT = "http://imce.jpl.nasa.gov/foundation/mission#Component"
 const SUPPLIES = "http://imce.jpl.nasa.gov/foundation/project#supplies"
 const HAS_NUMBER = "<http://studioj.us/metrology#hasNumber>"
+const HAS_UNIT = "<http://studioj.us/metrology#hasUnit>"
 const HAS_POI_CONVENTION = "<http://studioj.us/metrology#hasPoiConvention>"
 const IS_POINT_MASS = "<http://studioj.us/metrology#isPointMass>"
+const HAS_COMPONENT_IDENTIFIER = "<http://studioj.us/base#hasComponentIdentifier"
+const HAS_WORK_PACKAGE_IDENTIFIER = "<http://studioj.us/base#hasWorkPackageIdentifier"
+const KG_UNIT = "<http://studioj.us/units#kg>"
+const MM_UNIT = "<http://studioj.us/units#mm>"
+const KG_MM_2_UNIT = "<http://studioj.us/units#kg_mm_2"
 
 function parse_commandline()
     s = ArgParseSettings()
@@ -96,7 +102,7 @@ function add_authorization(iri, authorizer)
         "addAnnotation" => Dict(
             "ontologyIri" => iri,
             "subjectIri" => iri,
-            "predicateIri" => "http://purl.org/dc/elements/1.1/creator",
+            "predicateIri" => DC_CREATOR,
             "object" => authorizer
         )
     )
@@ -162,6 +168,13 @@ function (@main)(ARGS)
         "sigma_Iyz" => "ProductOfInertiaQuantity"
     )
 
+    unit_map = Dict(
+        "MassQuantity" => KG_UNIT,
+        "CenterOfMassQuantity" => MM_UNIT,
+        "MomentOfInertiaQuantity" => KG_MM_2_UNIT,
+        "ProductOfInertiaQuantity" => KG_MM_2_UNIT
+    )
+
     args = parse_commandline()
 
     vl = JSON3.read(args["input"])
@@ -186,6 +199,8 @@ function (@main)(ARGS)
 
         operations = []
 
+        authorizer = wpd["isAuthorizedBy"]
+
         # description for quantity values
 
         qvd_iri = args["namespace-base"] * "/" * wp * "/QV"
@@ -194,7 +209,7 @@ function (@main)(ARGS)
 
         # parent iris and namespaces
 
-        parent_wp_iri_frag = args["namespace-base"] * "/" * wpd["isAuthorizedBy"]
+        parent_wp_iri_frag = args["namespace-base"] * "/" * authorizer
 
         cont_comp_d_iri = parent_wp_iri_frag * "/C"
         cont_comp_d_ns = cont_comp_d_iri * args["separator"]
@@ -202,7 +217,7 @@ function (@main)(ARGS)
         cont_comp_qd_iri = parent_wp_iri_frag * "/Q"
         cont_comp_qd_ns = cont_comp_qd_iri * args["separator"]
 
-        authorizer = wpd["isAuthorizedBy"]
+        parent_wp_iri = parent_wp_iri_frag * "/WP" * args["separator"] * wp
 
         # delete existing descriptions
 
@@ -221,9 +236,9 @@ function (@main)(ARGS)
 
         # add authorization annotations to descriptions
 
-        push!(operations, add_authorization(qvd_iri, authorizer))
+        # push!(operations, add_authorization(qvd_iri, parent_wp_iri))
 
-       if length(wpd["authorizes"]) > 0
+        if length(wpd["authorizes"]) > 0
 
             # description for components
 
@@ -250,9 +265,9 @@ function (@main)(ARGS)
 
             # add authorization annotations to descriptions
 
-            push!(operations, add_authorization(cd_iri, authorizer))
-            push!(operations, add_authorization(wpd_iri, authorizer))
-            push!(operations, add_authorization(qd_iri, authorizer))
+            # push!(operations, add_authorization(cd_iri, parent_wp_iri))
+            # push!(operations, add_authorization(wpd_iri, parent_wp_iri))
+            # push!(operations, add_authorization(qd_iri, parent_wp_iri))
 
             # add imports
 
@@ -272,6 +287,7 @@ function (@main)(ARGS)
                 wp_iri = wpd_ns * String(wp)
                 push!(operations, add_assertion(wpd_iri, wp_iri, RDF_TYPE, WORK_PACKAGE))
                 push!(operations, add_assertion(wpd_iri, wp_iri, HAS_CANONICAL_NAME, wpd["hasName"][comp]))
+                push!(operations, add_assertion(wpd_iri, wp_iri, HAS_WORK_PACKAGE_IDENTIFIER, wp))
 
                 # create component
 
@@ -279,6 +295,7 @@ function (@main)(ARGS)
                 comp_iri = cd_ns * String(comp)
                 push!(operations, add_assertion(cd_iri, comp_iri, RDF_TYPE, COMPONENT))
                 push!(operations, add_assertion(cd_iri, comp_iri, HAS_CANONICAL_NAME, wpd["hasName"][comp]))
+                push!(operations, add_assertion(cd_iri, comp_iri, HAS_COMPONENT_IDENTIFIER, comp))
                 cont_comp_iri = cont_comp_d_ns * wpd["supplies"]
                 if (cont_comp_iri != comp_iri)
                     push!(operations, add_assertion(cd_iri, comp_iri, IS_CONTAINED_IN, cont_comp_iri))
@@ -321,12 +338,9 @@ function (@main)(ARGS)
             if haskey(wpd, "hasValues") && haskey(wpd["hasValues"], quantity)
                 value = wpd["hasValues"][quantity]
                 push!(operations, add_assertion(qvd_iri, qv_iri, HAS_NUMBER, Dict("\$type" => "DoubleLiteral", "value" => value)))
-            end
+                push!(operations, add_assertion(qvd_iri, qv_iri, HAS_UNIT, unit_map[kind]))
+             end
 
-        end
-
-        open("/tmp/body.json", "w") do file
-            JSON3.pretty(file, operations)
         end
 
         if args["deferred"]
