@@ -312,11 +312,17 @@ function (@main)(ARGS)
             qv_name = q_name * "_value"
             q_iri = cont_comp_qd_ns * q_name
             qv_iri = qvd_ns * qv_name
-            type = replace(kind, "Quantity" => "Value")
+            qtype = replace(kind, "Quantity" => "Value")
             push!(operations, create_instance(qvd_iri, qv_name))
             push!(operations, add_annotation(qvd_iri, qv_iri, RDFS_LABEL, quantity))
-            push!(operations, add_assertion(qvd_iri, qv_iri, RDF_TYPE, "http://studioj.us/metrology#$type"))
+            push!(operations, add_assertion(qvd_iri, qv_iri, RDF_TYPE, "http://studioj.us/metrology#$qtype"))
             push!(operations, add_assertion(qvd_iri, qv_iri, CHARACTERIZES, q_iri))
+
+            if haskey(wpd, "hasValues") && haskey(wpd["hasValues"], quantity)
+                value = wpd["hasValues"][quantity]
+                push!(operations, add_assertion(qvd_iri, qv_iri, HAS_NUMBER, Dict("\$type" => "DoubleLiteral", "value" => value)))
+            end
+
         end
 
         open("/tmp/body.json", "w") do file
