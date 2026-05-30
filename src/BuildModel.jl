@@ -224,21 +224,14 @@ function (@main)(ARGS)
 
         parent_wp_iri_frag = args["namespace-base"] * "/" * authorizer
 
-        cont_comp_d_iri = parent_wp_iri_frag * "/C"
-        cont_comp_d_ns = cont_comp_d_iri * args["separator"]
-        cont_comp_iri = cont_comp_d_ns * wpd["supplies"]
+        comp_d_iri = parent_wp_iri_frag * "/C"
+        comp_d_ns = comp_d_iri * args["separator"]
+        comp_iri = comp_d_ns * wpd["supplies"]
  
-        cont_comp_qd_iri = parent_wp_iri_frag * "/Q"
-        cont_comp_qd_ns = cont_comp_qd_iri * args["separator"]
+        comp_qd_iri = parent_wp_iri_frag * "/Q"
+        comp_qd_ns = comp_qd_iri * args["separator"]
 
         parent_wp_iri = parent_wp_iri_frag * "/WP" * args["separator"] * wp
-
-        # delete existing descriptions
-
-        # push!(operations, delete_description(qd_ns))
-        # push!(operations, delete_description(qvd_ns))
-
-        # create descriptions
 
         # description for quantities
 
@@ -262,26 +255,11 @@ function (@main)(ARGS)
             wpd_ns = wpd_iri * args["separator"]
             wpd_prefix = wp * "_WP"
 
-            # delete existing descriptions
-
-            # push!(operations, delete_description(cd_ns))
-            # push!(operations, delete_description(wpd_ns))
-
-            # create descriptions
+             # create descriptions
 
             push!(operations, add_description(cd_ns, cd_prefix, args["path-base"]))
             push!(operations, add_description(wpd_ns, wpd_prefix, args["path-base"]))
             push!(operations, add_description(qd_ns, qd_prefix, args["path-base"]))
-
-            # add imports
-
-            # push!(operations, add_import(wpd_ns, cd_ns))
-            # push!(operations, add_import(qd_ns, cd_ns))
-            # push!(operations, add_import(qvd_ns, cont_comp_qd_ns))
-
-            if wp != authorizer
-                # push!(operations, add_import(cd_ns, cont_comp_d_ns))
-            end
 
             for (wp, comp) in wpd["authorizes"]
 
@@ -300,8 +278,8 @@ function (@main)(ARGS)
                 push!(operations, add_assertion(cd_iri, child_comp_iri, RDF_TYPE, COMPONENT))
                 push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_CANONICAL_NAME, wpd["hasName"][comp]))
                 push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_COMPONENT_IDENTIFIER, comp))
-                if (cont_comp_iri != child_comp_iri)
-                    push!(operations, add_assertion(cd_iri, child_comp_iri, IS_CONTAINED_IN, cont_comp_iri))
+                if (comp_iri != child_comp_iri)
+                    push!(operations, add_assertion(cd_iri, child_comp_iri, IS_CONTAINED_IN, comp_iri))
                 end
 
                 # add supplies relation from work package to component
@@ -334,7 +312,7 @@ function (@main)(ARGS)
         for (quantity, kind) in quantity_map
             q_name = wpd["supplies"] * "_" * quantity
             qv_name = q_name * "_value"
-            q_iri = cont_comp_qd_ns * q_name
+            q_iri = comp_qd_ns * q_name
             qv_iri = qvd_ns * qv_name
             qtype = replace(kind, "Quantity" => "Value")
             push!(operations, create_instance(qvd_iri, qv_name))
@@ -349,14 +327,18 @@ function (@main)(ARGS)
              end
         end
 
-        push!(operations, create_instance_ref(qvd_iri, cont_comp_iri))
-        push!(operations, add_assertion(qvd_iri, cont_comp_iri, HAS_POI_CONVENTION, wpd["hasPOIconv"]))
-        push!(operations, add_assertion(qvd_iri, cont_comp_iri, IS_POINT_MASS, wpd["isPointMass"]))
+        # add related property values
+
+        push!(operations, create_instance_ref(qvd_iri, comp_iri))
+        push!(operations, add_assertion(qvd_iri, comp_iri, HAS_POI_CONVENTION, wpd["hasPOIconv"]))
+        push!(operations, add_assertion(qvd_iri, comp_iri, IS_POINT_MASS, wpd["isPointMass"]))
 
         # add authorization annotations to descriptions
 
         push!(operations, add_authorization(qvd_iri, parent_wp_iri))
 
+        # update server
+        
         if args["deferred"]
             push!(deferred, operations...)
             println("Deferred update for ", wp, " with ", length(operations), " operations")
