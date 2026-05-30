@@ -65,7 +65,9 @@ end
 function update(server, operations)
     body = Dict("operations" => operations, "deferDiagnostics" => true)
     resp = HTTP.post("$server/v0/update", headers=Dict("Content-Type" => "application/json"), body=JSON3.write(body))
-    # println("Response: ", resp.status, " - ", String(resp.body))
+    # open("/tmp/log.txt", "a") do log
+    #     println(log, "Response: ", resp.status, " - ", String(resp.body))
+    # end
     return resp.status == 200
 end
 
@@ -113,6 +115,15 @@ function create_instance(description_iri, name)
         "createInstance" => Dict(
             "descriptionIri" => description_iri,
             "instanceName" => name
+        )
+    )
+end
+
+function create_instance_ref(description_iri, iri)
+    Dict(
+        "createInstanceRef" => Dict(
+            "descriptionIri" => description_iri,
+            "instanceIri" => iri
         )
     )
 end
@@ -215,7 +226,8 @@ function (@main)(ARGS)
 
         cont_comp_d_iri = parent_wp_iri_frag * "/C"
         cont_comp_d_ns = cont_comp_d_iri * args["separator"]
-
+        cont_comp_iri = cont_comp_d_ns * wpd["supplies"]
+ 
         cont_comp_qd_iri = parent_wp_iri_frag * "/Q"
         cont_comp_qd_ns = cont_comp_qd_iri * args["separator"]
 
@@ -276,28 +288,25 @@ function (@main)(ARGS)
                 # create work package
 
                 push!(operations, create_instance(wpd_iri, wp))
-                wp_iri = wpd_ns * String(wp)
-                push!(operations, add_assertion(wpd_iri, wp_iri, RDF_TYPE, WORK_PACKAGE))
-                push!(operations, add_assertion(wpd_iri, wp_iri, HAS_CANONICAL_NAME, wpd["hasName"][comp]))
-                push!(operations, add_assertion(wpd_iri, wp_iri, HAS_WORK_PACKAGE_IDENTIFIER, wp))
+                child_wp_iri = wpd_ns * String(wp)
+                push!(operations, add_assertion(wpd_iri, child_wp_iri, RDF_TYPE, WORK_PACKAGE))
+                push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_CANONICAL_NAME, wpd["hasName"][comp]))
+                push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_WORK_PACKAGE_IDENTIFIER, wp))
 
                 # create component
 
                 push!(operations, create_instance(cd_iri, comp))
-                comp_iri = cd_ns * String(comp)
-                push!(operations, add_assertion(cd_iri, comp_iri, RDF_TYPE, COMPONENT))
-                push!(operations, add_assertion(cd_iri, comp_iri, HAS_CANONICAL_NAME, wpd["hasName"][comp]))
-                push!(operations, add_assertion(cd_iri, comp_iri, HAS_COMPONENT_IDENTIFIER, comp))
-                cont_comp_iri = cont_comp_d_ns * wpd["supplies"]
-                if (cont_comp_iri != comp_iri)
-                    push!(operations, add_assertion(cd_iri, comp_iri, IS_CONTAINED_IN, cont_comp_iri))
+                child_comp_iri = cd_ns * String(comp)
+                push!(operations, add_assertion(cd_iri, child_comp_iri, RDF_TYPE, COMPONENT))
+                push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_CANONICAL_NAME, wpd["hasName"][comp]))
+                push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_COMPONENT_IDENTIFIER, comp))
+                if (cont_comp_iri != child_comp_iri)
+                    push!(operations, add_assertion(cd_iri, child_comp_iri, IS_CONTAINED_IN, cont_comp_iri))
                 end
-                push!(operations, add_assertion(cd_iri, comp_iri, HAS_POI_CONVENTION, wpd["hasPOIconv"]))
-                push!(operations, add_assertion(cd_iri, comp_iri, IS_POINT_MASS, wpd["isPointMass"]))
 
                 # add supplies relation from work package to component
 
-                push!(operations, add_assertion(wpd_iri, wp_iri, SUPPLIES, comp_iri))
+                push!(operations, add_assertion(wpd_iri, child_wp_iri, SUPPLIES, child_comp_iri))
 
                 # create mass property quantities and quantity values
 
@@ -307,7 +316,7 @@ function (@main)(ARGS)
                     push!(operations, create_instance(qd_iri, q_name))
                     push!(operations, add_annotation(qd_iri, q_iri, RDFS_LABEL, quantity))
                     push!(operations, add_assertion(qd_iri, q_iri, RDF_TYPE, "http://studioj.us/metrology#$kind"))
-                    push!(operations, add_assertion(qd_iri, q_iri, CHARACTERIZES, comp_iri))
+                    push!(operations, add_assertion(qd_iri, q_iri, CHARACTERIZES, child_comp_iri))
                 end
 
             end
@@ -339,6 +348,10 @@ function (@main)(ARGS)
                 push!(operations, add_assertion(qvd_iri, qv_iri, HAS_UNIT, unit_map[kind]))
              end
         end
+
+        push!(operations, create_instance_ref(qvd_iri, cont_comp_iri))
+        push!(operations, add_assertion(qvd_iri, cont_comp_iri, HAS_POI_CONVENTION, wpd["hasPOIconv"]))
+        push!(operations, add_assertion(qvd_iri, cont_comp_iri, IS_POINT_MASS, wpd["isPointMass"]))
 
         # add authorization annotations to descriptions
 
