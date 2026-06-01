@@ -8,6 +8,7 @@ module Main
     using MassProps
     using OrderedCollections
     using JSON3
+    using Printf
 
     function parse_commandline()
         s = ArgParseSettings()
@@ -96,13 +97,18 @@ module Main
             cust = customer(c, tree)
             supp = supplier(c)
             if !haskey(wpd, supp)
-                wpd[supp] = Dict("isAuthorizedBy" => cust, "authorizes" => Dict{String, String}(), "hasName" => Dict{String, String}())
+                wpd[supp] = Dict(
+                    "isAuthorizedBy" => cust,
+                    "authorizes" => Dict{String, String}(),
+                    "hasName" => Dict{String, String}(),
+                    "hasSortKey" => Dict{String, String}()
+                )
             end
             cwp = wpd[cust]
             cwp["authorizes"][supp] = c
             swp = wpd[supp]
             swp["supplies"] = c
-        end
+       end
 
         for row in eachrow(table)
             c = row["id"]
@@ -144,6 +150,7 @@ module Main
             if haskey(wpd, p_supp)
                 pwp = wpd[p_supp]
                 pwp["hasName"][c] = row["name"]
+                pwp["hasSortKey"][c] = join(map(x -> @sprintf("%02d", parse(Int, x)), split(c, ".")[2:end]))
             end
         end
 
