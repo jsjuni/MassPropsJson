@@ -22,6 +22,7 @@ const HAS_WORK_PACKAGE_IDENTIFIER = "<http://studioj.us/base#hasWorkPackageIdent
 const KG_UNIT = "<http://studioj.us/units#kg>"
 const MM_UNIT = "<http://studioj.us/units#mm>"
 const KG_MM_2_UNIT = "<http://studioj.us/units#kg_mm_2"
+const HAS_SORT_KEY = "<http://imce.jpl.nasa.gov/foundation/base#hasSortKey>"
 
 function parse_commandline()
     s = ArgParseSettings()
@@ -83,6 +84,17 @@ function add_description(namespace, prefix, path)
     Dict(
         "createOntology" => Dict(
             "ontologyKind" => "description",
+            "ontologyNamespace" => namespace,
+            "ontologyPrefix" => prefix,
+            "targetFolder" => path
+        )
+    )
+end
+
+function add_description_bundle(namespace, prefix, path)
+    Dict(
+        "createOntology" => Dict(
+            "ontologyKind" => "description bundle",
             "ontologyNamespace" => namespace,
             "ontologyPrefix" => prefix,
             "targetFolder" => path
@@ -202,6 +214,14 @@ function (@main)(ARGS)
     deferred = []
     updates = []
 
+    # create description bundle
+
+    db_iri = args["namespace-base"] * "/bundle"
+    db_ns = db_iri = db_iri * args["separator"]
+    db_prefix = "description-bundle"
+
+    bundled = [add_description_bundle(db_ns, db_prefix, args["path-base"])]
+
     for (i, v) in enumerate(vl)
         if args["limit"] > 0 && i > args["limit"]
             println("Reached limit of ", args["limit"], " components. Stopping.")
@@ -240,6 +260,7 @@ function (@main)(ARGS)
         qd_prefix = wp * "_Q"
 
         push!(operations, add_description(qvd_ns, qvd_prefix, args["path-base"]))
+        push!(bundled, add_import(db_ns, qvd_ns))
 
         if length(wpd["authorizes"]) > 0
 
@@ -258,8 +279,11 @@ function (@main)(ARGS)
              # create descriptions
 
             push!(operations, add_description(cd_ns, cd_prefix, args["path-base"]))
+            push!(bundled, add_import(db_ns, cd_ns))
             push!(operations, add_description(wpd_ns, wpd_prefix, args["path-base"]))
+            push!(bundled, add_import(db_ns, wpd_ns))
             push!(operations, add_description(qd_ns, qd_prefix, args["path-base"]))
+            push!(bundled, add_import(db_ns, qd_ns))
 
             for (wp, comp) in wpd["authorizes"]
 
@@ -270,6 +294,7 @@ function (@main)(ARGS)
                 push!(operations, add_assertion(wpd_iri, child_wp_iri, RDF_TYPE, WORK_PACKAGE))
                 push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_CANONICAL_NAME, wpd["hasName"][comp]))
                 push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_WORK_PACKAGE_IDENTIFIER, wp))
+                push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_SORT_KEY, wpd["hasSortKey"][comp]))
 
                 # create component
 
@@ -278,6 +303,7 @@ function (@main)(ARGS)
                 push!(operations, add_assertion(cd_iri, child_comp_iri, RDF_TYPE, COMPONENT))
                 push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_CANONICAL_NAME, wpd["hasName"][comp]))
                 push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_COMPONENT_IDENTIFIER, comp))
+                push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_SORT_KEY, wpd["hasSortKey"][comp]))
                 if (comp_iri != child_comp_iri)
                     push!(operations, add_assertion(cd_iri, child_comp_iri, IS_CONTAINED_IN, comp_iri))
                 end
@@ -321,7 +347,7 @@ function (@main)(ARGS)
             push!(operations, add_assertion(qvd_iri, qv_iri, CHARACTERIZES, q_iri))
 
             if haskey(wpd, "hasValues") && haskey(wpd["hasValues"], quantity)
-                value = wpd["hasValues"][quantity]
+                value = parse(Float64, wpd["hasValues"][quantity])
                 push!(operations, add_assertion(qvd_iri, qv_iri, HAS_NUMBER, Dict("\$type" => "DoubleLiteral", "value" => value)))
                 push!(operations, add_assertion(qvd_iri, qv_iri, HAS_UNIT, unit_map[kind]))
              end
@@ -353,6 +379,16 @@ function (@main)(ARGS)
 
     end
 
+    if args["deferred"]
+        push!(deferred, bundled)
+        println("Deferred update for description bundle with ", length(bundled), " operations")
+    else
+        t1 = time()
+        update(server, bundled)
+        t2 = time()
+        println("Updated server for description bundle with ", length(bundled), " operations in ", round(t2 - t1, digits=2), " s")
+    end
+
     if args["deferred"] && length(deferred) > 0
         t1 = time()
         update(server, deferred)
@@ -368,7 +404,7 @@ function (@main)(ARGS)
     end
 
     end_time = time()
-    println("Updated server with ", length(deferred), " operations in ", round(end_time - start_time, digits=2), " s")
+    println("finished in ", round(end_time - start_time, digits=2), " s")
 
     exit(0)
 end
