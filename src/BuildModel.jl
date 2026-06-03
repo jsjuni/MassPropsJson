@@ -19,6 +19,7 @@ const HAS_POI_CONVENTION = "<http://studioj.us/metrology#hasPoiConvention>"
 const IS_POINT_MASS = "<http://studioj.us/metrology#isPointMass>"
 const HAS_COMPONENT_IDENTIFIER = "<http://studioj.us/base#hasComponentIdentifier"
 const HAS_WORK_PACKAGE_IDENTIFIER = "<http://studioj.us/base#hasWorkPackageIdentifier"
+const HAS_QUANTITY_IDENTIFIER = "<http://studioj.us/metrology#hasQuantityIdentifier>"
 const KG_UNIT = "<http://studioj.us/units#kg>"
 const MM_UNIT = "<http://studioj.us/units#mm>"
 const KG_MM_2_UNIT = "<http://studioj.us/units#kg_mm_2"
@@ -319,6 +320,7 @@ function (@main)(ARGS)
                     q_iri = qd_ns * q_name
                     push!(operations, create_instance(qd_iri, q_name))
                     push!(operations, add_annotation(qd_iri, q_iri, RDFS_LABEL, quantity))
+                    push!(operations, add_assertion(qd_iri, q_iri, HAS_QUANTITY_IDENTIFIER, q_name))
                     push!(operations, add_assertion(qd_iri, q_iri, RDF_TYPE, "http://studioj.us/metrology#$kind"))
                     push!(operations, add_assertion(qd_iri, q_iri, CHARACTERIZES, child_comp_iri))
                 end
@@ -373,7 +375,6 @@ function (@main)(ARGS)
             update(server, operations)
             t2 = time()
             println("Updated server for ", wp, " (", i, ") ", length(operations), " operations in ", round(t2 - t1, digits=2), " s")
-            # sleep(1)
             push!(updates, operations)
         end
 
@@ -394,14 +395,7 @@ function (@main)(ARGS)
         update(server, deferred)
         t2 = time()
         println("Updated server with ", length(deferred), " operations in ", round(t2 - t1, digits=2), " s")
-        open("/tmp/operations.json", "w") do file
-            JSON3.pretty(file, deferred)
-        end
-    end
-
-    open("/tmp/updates.json", "w") do file
-        JSON3.pretty(file, updates)
-    end
+   end
 
     end_time = time()
     println("finished in ", round(end_time - start_time, digits=2), " s")
