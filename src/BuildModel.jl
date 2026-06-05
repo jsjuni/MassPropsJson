@@ -8,7 +8,7 @@ const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 const RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label"
 const DC_CREATOR = "http://purl.org/dc/elements/1.1/creator"
 const HAS_CANONICAL_NAME = "http://imce.jpl.nasa.gov/foundation/base#hasCanonicalName"
-const IS_CONTAINED_IN = "http://imce.jpl.nasa.gov/foundation/base#isContainedIn"
+const CONTAINS = "http://imce.jpl.nasa.gov/foundation/base#contains"
 const CHARACTERIZES = "http://imce.jpl.nasa.gov/foundation/analysis#characterizes"
 const WORK_PACKAGE = "http://imce.jpl.nasa.gov/foundation/project#WorkPackage"
 const PROJECT = "http://imce.jpl.nasa.gov/foundation/project#Project"
@@ -308,7 +308,14 @@ function (@main)(ARGS)
             push!(operations, add_description(qd_ns, qd_prefix, args["path-base"]))
             push!(bundled, add_import(db_ns, qd_ns))
 
-            for (wp, comp) in authority_data["authorizes"]
+            if is_supplier
+
+                # create ref for "contains" assertions
+
+                push!(operations, create_instance_ref(cd_iri, supplied_comp_iri))
+            end
+
+             for (wp, comp) in authority_data["authorizes"]
 
                 # create work package
 
@@ -328,7 +335,7 @@ function (@main)(ARGS)
                 push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_COMPONENT_IDENTIFIER, comp))
                 push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_SORT_KEY, authority_data["hasSortKey"][comp]))
                 if (is_supplier)
-                    push!(operations, add_assertion(cd_iri, child_comp_iri, IS_CONTAINED_IN, supplied_comp_iri))
+                    push!(operations, add_assertion(cd_iri, supplied_comp_iri, CONTAINS, child_comp_iri))
                 end
 
                 # add supplies relation from work package to component
