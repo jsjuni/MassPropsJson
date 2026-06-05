@@ -11,6 +11,7 @@ const HAS_CANONICAL_NAME = "http://imce.jpl.nasa.gov/foundation/base#hasCanonica
 const IS_CONTAINED_IN = "http://imce.jpl.nasa.gov/foundation/base#isContainedIn"
 const CHARACTERIZES = "http://imce.jpl.nasa.gov/foundation/analysis#characterizes"
 const WORK_PACKAGE = "http://imce.jpl.nasa.gov/foundation/project#WorkPackage"
+const PROJECT = "http://imce.jpl.nasa.gov/foundation/project#Project"
 const COMPONENT = "http://imce.jpl.nasa.gov/foundation/mission#Component"
 const SUPPLIES = "http://imce.jpl.nasa.gov/foundation/project#supplies"
 const HAS_NUMBER = "<http://studioj.us/metrology#hasNumber>"
@@ -241,11 +242,12 @@ function (@main)(ARGS)
         # parent iris and namespaces
 
         authorizing_iri_frag = args["namespace-base"] * "/" * authorizer
-        authorizing_iri = authorizing_iri_frag * "/WP" * args["separator"] * authority
 
         if (is_supplier = haskey(authority_data, "supplies"))
 
-            # supplied component details
+            authorizing_iri = authorizing_iri_frag * "/WP" * args["separator"] * authority
+
+        # supplied component details
 
             supplied_comp_d_iri = authorizing_iri_frag * "/C"
             supplied_comp_d_ns = supplied_comp_d_iri * args["separator"]
@@ -260,6 +262,21 @@ function (@main)(ARGS)
 
             push!(operations, add_description(supplied_comp_qvd_ns, supplied_comp_qvd_prefix, args["path-base"]))
             push!(bundled, add_import(db_ns, supplied_comp_qvd_ns))
+
+        else
+
+            authorizing_d_iri = authorizing_iri_frag * "/P"
+            authorizing_d_ns = authorizing_d_iri * args["separator"]
+
+            authorizing_iri = authorizing_d_ns * authority
+            authorizing_prefix = authority * "_P"
+
+            push!(operations, add_description(authorizing_d_ns, authorizing_prefix, args["path-base"]))
+            push!(operations, create_instance(authorizing_d_iri, authority))
+            push!(operations, add_assertion(authorizing_d_iri, authorizing_iri, RDF_TYPE, PROJECT))
+            push!(operations, add_assertion(authorizing_d_iri, authorizing_iri, HAS_CANONICAL_NAME, authority_data["hasName"][authority]))
+            push!(bundled, add_import(db_ns, authorizing_d_ns))
+            
         end
 
         if length(authority_data["authorizes"]) > 0
@@ -341,7 +358,7 @@ function (@main)(ARGS)
         end
 
         if is_supplier
-            
+
             # add quantity values
 
             for (quantity, kind) in quantity_map

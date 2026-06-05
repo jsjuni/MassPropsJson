@@ -95,7 +95,7 @@ module Main
         wpd[project_id] = Dict(
             "isAuthorizedBy" => "P.1",
             "authorizes" => Dict("WP.4" => "C.1"),
-            "hasName" => Dict("C.1" => "System 1"),
+            "hasName" => Dict("C.1" => "System 1", "P.1" => "Project 1"),
             "hasSortKey" => Dict("C.1" => "01")
         )
 
