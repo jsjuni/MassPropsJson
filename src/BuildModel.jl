@@ -231,56 +231,58 @@ function (@main)(ARGS)
             println("Reached limit of ", args["limit"], " components. Stopping.")
             break
         end
-        wp = String(v.first)
-        wpd = v.second
+        authority = String(v.first)
+        authority_data = v.second
 
         operations = []
 
-        authorizer = wpd["isAuthorizedBy"]
-
-        # description for quantity values
-
-        qvd_iri = args["namespace-base"] * "/" * wp * "/QV"
-        qvd_ns = qvd_iri * args["separator"]
-        qvd_prefix = wp * "_QV"
+        authorizer = authority_data["isAuthorizedBy"]
 
         # parent iris and namespaces
 
-        parent_wp_iri_frag = args["namespace-base"] * "/" * authorizer
+        authorizing_iri_frag = args["namespace-base"] * "/" * authorizer
+        authorizing_iri = authorizing_iri_frag * "/WP" * args["separator"] * authority
 
-        comp_d_iri = parent_wp_iri_frag * "/C"
-        comp_d_ns = comp_d_iri * args["separator"]
-        comp_iri = comp_d_ns * wpd["supplies"]
- 
-        comp_qd_iri = parent_wp_iri_frag * "/Q"
-        comp_qd_ns = comp_qd_iri * args["separator"]
+        if (is_supplier = haskey(authority_data, "supplies"))
 
-        parent_wp_iri = parent_wp_iri_frag * "/WP" * args["separator"] * wp
+            # supplied component details
 
-        # description for quantities
+            supplied_comp_d_iri = authorizing_iri_frag * "/C"
+            supplied_comp_d_ns = supplied_comp_d_iri * args["separator"]
+            supplied_comp_iri = supplied_comp_d_ns * authority_data["supplies"]
+    
+            supplied_comp_qd_iri = authorizing_iri_frag * "/Q"
+            supplied_comp_qd_ns = supplied_comp_qd_iri * args["separator"]
 
-        qd_iri = args["namespace-base"] * "/" * wp * "/Q"
-        qd_ns = qd_iri * args["separator"]
-        qd_prefix = wp * "_Q"
+            supplied_comp_qvd_iri = args["namespace-base"] * "/" * authority * "/QV"
+            supplied_comp_qvd_ns = supplied_comp_qvd_iri * args["separator"]
+            supplied_comp_qvd_prefix = authority * "_QV"
 
-        push!(operations, add_description(qvd_ns, qvd_prefix, args["path-base"]))
-        push!(bundled, add_import(db_ns, qvd_ns))
+            push!(operations, add_description(supplied_comp_qvd_ns, supplied_comp_qvd_prefix, args["path-base"]))
+            push!(bundled, add_import(db_ns, supplied_comp_qvd_ns))
+        end
 
-        if length(wpd["authorizes"]) > 0
+        if length(authority_data["authorizes"]) > 0
 
             # description for components
 
-            cd_iri = args["namespace-base"] * "/" * wp * "/C"
+            cd_iri = args["namespace-base"] * "/" * authority * "/C"
             cd_ns = cd_iri * args["separator"]
-            cd_prefix = wp * "_C"
+            cd_prefix = authority * "_C"
 
             # description for work packages
 
-            wpd_iri = args["namespace-base"] * "/" * wp * "/WP"
+            wpd_iri = args["namespace-base"] * "/" * authority * "/WP"
             wpd_ns = wpd_iri * args["separator"]
-            wpd_prefix = wp * "_WP"
+            wpd_prefix = authority * "_WP"
 
-             # create descriptions
+            # description for quantities
+
+            qd_iri = args["namespace-base"] * "/" * authority * "/Q"
+            qd_ns = qd_iri * args["separator"]
+            qd_prefix = authority * "_Q"
+
+            # create descriptions
 
             push!(operations, add_description(cd_ns, cd_prefix, args["path-base"]))
             push!(bundled, add_import(db_ns, cd_ns))
@@ -289,27 +291,27 @@ function (@main)(ARGS)
             push!(operations, add_description(qd_ns, qd_prefix, args["path-base"]))
             push!(bundled, add_import(db_ns, qd_ns))
 
-            for (wp, comp) in wpd["authorizes"]
+            for (wp, comp) in authority_data["authorizes"]
 
                 # create work package
 
                 push!(operations, create_instance(wpd_iri, wp))
                 child_wp_iri = wpd_ns * String(wp)
                 push!(operations, add_assertion(wpd_iri, child_wp_iri, RDF_TYPE, WORK_PACKAGE))
-                push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_CANONICAL_NAME, wpd["hasName"][comp]))
+                push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_CANONICAL_NAME, authority_data["hasName"][comp]))
                 push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_WORK_PACKAGE_IDENTIFIER, wp))
-                push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_SORT_KEY, wpd["hasSortKey"][comp]))
+                push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_SORT_KEY, authority_data["hasSortKey"][comp]))
 
                 # create component
 
                 push!(operations, create_instance(cd_iri, comp))
                 child_comp_iri = cd_ns * String(comp)
                 push!(operations, add_assertion(cd_iri, child_comp_iri, RDF_TYPE, COMPONENT))
-                push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_CANONICAL_NAME, wpd["hasName"][comp]))
+                push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_CANONICAL_NAME, authority_data["hasName"][comp]))
                 push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_COMPONENT_IDENTIFIER, comp))
-                push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_SORT_KEY, wpd["hasSortKey"][comp]))
-                if (comp_iri != child_comp_iri)
-                    push!(operations, add_assertion(cd_iri, child_comp_iri, IS_CONTAINED_IN, comp_iri))
+                push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_SORT_KEY, authority_data["hasSortKey"][comp]))
+                if (is_supplier)
+                    push!(operations, add_assertion(cd_iri, child_comp_iri, IS_CONTAINED_IN, supplied_comp_iri))
                 end
 
                 # add supplies relation from work package to component
@@ -332,52 +334,55 @@ function (@main)(ARGS)
 
             # add authorization annotations to descriptions
 
-            push!(operations, add_authorization(cd_iri, parent_wp_iri))
-            push!(operations, add_authorization(wpd_iri, parent_wp_iri))
-            push!(operations, add_authorization(qd_iri, parent_wp_iri))
+            push!(operations, add_authorization(cd_iri, authorizing_iri))
+            push!(operations, add_authorization(wpd_iri, authorizing_iri))
+            push!(operations, add_authorization(qd_iri, authorizing_iri))
 
         end
 
-        # add quantity values
+        if is_supplier
+            
+            # add quantity values
 
-        for (quantity, kind) in quantity_map
-            q_name = wpd["supplies"] * "_" * quantity
-            qv_name = q_name * "_value"
-            q_iri = comp_qd_ns * q_name
-            qv_iri = qvd_ns * qv_name
-            qtype = replace(kind, "Quantity" => "Value")
-            push!(operations, create_instance(qvd_iri, qv_name))
-            push!(operations, add_annotation(qvd_iri, qv_iri, RDFS_LABEL, quantity))
-            push!(operations, add_assertion(qvd_iri, qv_iri, RDF_TYPE, "http://studioj.us/metrology#$qtype"))
-            push!(operations, add_assertion(qvd_iri, qv_iri, CHARACTERIZES, q_iri))
+            for (quantity, kind) in quantity_map
+                q_name = authority_data["supplies"] * "_" * quantity
+                qv_name = q_name * "_value"
+                q_iri = supplied_comp_qd_ns * q_name
+                qv_iri = supplied_comp_qvd_ns * qv_name
+                qtype = replace(kind, "Quantity" => "Value")
+                push!(operations, create_instance(supplied_comp_qvd_iri, qv_name))
+                push!(operations, add_annotation(supplied_comp_qvd_iri, qv_iri, RDFS_LABEL, quantity))
+                push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, RDF_TYPE, "http://studioj.us/metrology#$qtype"))
+                push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, CHARACTERIZES, q_iri))
 
-            if haskey(wpd, "hasValues") && haskey(wpd["hasValues"], quantity)
-                value = parse(Float64, wpd["hasValues"][quantity])
-                push!(operations, add_assertion(qvd_iri, qv_iri, HAS_NUMBER, Dict("\$type" => "DoubleLiteral", "value" => value)))
-                push!(operations, add_assertion(qvd_iri, qv_iri, HAS_UNIT, unit_map[kind]))
-             end
+                if haskey(authority_data, "hasValues") && haskey(authority_data["hasValues"], quantity)
+                    value = parse(Float64, authority_data["hasValues"][quantity])
+                    push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, HAS_NUMBER, Dict("\$type" => "DoubleLiteral", "value" => value)))
+                    push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, HAS_UNIT, unit_map[kind]))
+                end
+            end
+
+            # add related property values
+
+            push!(operations, create_instance_ref(supplied_comp_qvd_iri, supplied_comp_iri))
+            push!(operations, add_assertion(supplied_comp_qvd_iri, supplied_comp_iri, HAS_POI_CONVENTION, authority_data["hasPOIconv"]))
+            push!(operations, add_assertion(supplied_comp_qvd_iri, supplied_comp_iri, IS_POINT_MASS, authority_data["isPointMass"]))
+
+            # add authorization annotations to descriptions
+
+            push!(operations, add_authorization(supplied_comp_qvd_iri, authorizing_iri))
         end
-
-        # add related property values
-
-        push!(operations, create_instance_ref(qvd_iri, comp_iri))
-        push!(operations, add_assertion(qvd_iri, comp_iri, HAS_POI_CONVENTION, wpd["hasPOIconv"]))
-        push!(operations, add_assertion(qvd_iri, comp_iri, IS_POINT_MASS, wpd["isPointMass"]))
-
-        # add authorization annotations to descriptions
-
-        push!(operations, add_authorization(qvd_iri, parent_wp_iri))
 
         # update server
         
         if args["deferred"]
             push!(deferred, operations...)
-            println("Deferred update for ", wp, " with ", length(operations), " operations")
+            println("Deferred update for ", authority, " with ", length(operations), " operations")
         else
             t1 = time()
             update(server, operations, args["defer-diagnostics"])
             t2 = time()
-            println("Updated server for ", wp, " (", i, ") ", length(operations), " operations in ", round(t2 - t1, digits=2), " s")
+            println("Updated server for ", authority, " (", i, ") ", length(operations), " operations in ", round(t2 - t1, digits=2), " s")
             push!(updates, operations)
         end
 
