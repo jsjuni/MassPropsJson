@@ -60,18 +60,19 @@ module Main
         if length(parents) == 1
             return parents[1]
         elseif length(parents) == 0
-            return c
+            return nothing
         else
             return error("Multiple parents found for $c: ", parents)
         end
     end
 
-    function customer(c, tree)
-        return supplier(parent(c, tree))
+    function customer(c, tree, default)
+        p = parent(c, tree)
+        return p === nothing ? default : supplier(p)
     end
 
     function supplier(c)
-        return replace(c, r"^C" => "WP")
+        return replace(c, r"^C\.1" => "WP.4")
     end
 
     function (@main)(ARGS)
@@ -90,11 +91,19 @@ module Main
 
         wpd = OrderedCollections.OrderedDict{String, Dict{String, Any}}()
 
+        project_id = "P.1"
+        wpd[project_id] = Dict(
+            "isAuthorizedBy" => "P.1",
+            "authorizes" => Dict("WP.4" => "C.1"),
+            "hasName" => Dict("C.1" => "System 1"),
+            "hasSortKey" => Dict("C.1" => "01")
+        )
+
         for c in cl
             if occursin(Regex(args["reject"]), c)
                 continue
             end
-            cust = customer(c, tree)
+            cust = customer(c, tree, project_id)
             supp = supplier(c)
             if !haskey(wpd, supp)
                 wpd[supp] = Dict(
@@ -146,11 +155,13 @@ module Main
                     )
                 end
             end
-            p_supp = supplier(parent(c, tree))
-            if haskey(wpd, p_supp)
-                pwp = wpd[p_supp]
-                pwp["hasName"][c] = row["name"]
-                pwp["hasSortKey"][c] = join(map(x -> @sprintf("%02d", parse(Int, x)), split(c, ".")[2:end]))
+            if (p = parent(c, tree)) !== nothing
+                p_supp = supplier(parent(c, tree))
+                if haskey(wpd, p_supp)
+                    pwp = wpd[p_supp]
+                    pwp["hasName"][c] = row["name"]
+                    pwp["hasSortKey"][c] = join(map(x -> @sprintf("%02d", parse(Int, x)), split(c, ".")[2:end]))
+                end
             end
         end
 
