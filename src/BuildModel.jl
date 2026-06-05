@@ -18,12 +18,13 @@ const HAS_NUMBER = "<http://studioj.us/metrology#hasNumber>"
 const HAS_UNIT = "<http://studioj.us/metrology#hasUnit>"
 const HAS_POI_CONVENTION = "<http://studioj.us/metrology#hasPoiConvention>"
 const IS_POINT_MASS = "<http://studioj.us/metrology#isPointMass>"
-const HAS_COMPONENT_IDENTIFIER = "<http://studioj.us/base#hasComponentIdentifier"
-const HAS_WORK_PACKAGE_IDENTIFIER = "<http://studioj.us/base#hasWorkPackageIdentifier"
+const HAS_COMPONENT_IDENTIFIER = "<http://studioj.us/base#hasComponentIdentifier>"
+const HAS_WORK_PACKAGE_IDENTIFIER = "<http://studioj.us/base#hasWorkPackageIdentifier>"
+const HAS_PROJECT_IDENTIFIER = "<http://studioj.us/base#hasProjectIdentifier>"
 const HAS_QUANTITY_IDENTIFIER = "<http://studioj.us/metrology#hasQuantityIdentifier>"
 const KG_UNIT = "<http://studioj.us/units#kg>"
 const MM_UNIT = "<http://studioj.us/units#mm>"
-const KG_MM_2_UNIT = "<http://studioj.us/units#kg_mm_2"
+const KG_MM_2_UNIT = "<http://studioj.us/units#kg_mm_2>"
 const HAS_SORT_KEY = "<http://imce.jpl.nasa.gov/foundation/base#hasSortKey>"
 
 function parse_commandline()
@@ -247,7 +248,7 @@ function (@main)(ARGS)
 
             authorizing_iri = authorizing_iri_frag * "/WP" * args["separator"] * authority
 
-        # supplied component details
+            # supplied component details
 
             supplied_comp_d_iri = authorizing_iri_frag * "/C"
             supplied_comp_d_ns = supplied_comp_d_iri * args["separator"]
@@ -265,6 +266,8 @@ function (@main)(ARGS)
 
         else
 
+            # top=level project description
+
             authorizing_d_iri = authorizing_iri_frag * "/P"
             authorizing_d_ns = authorizing_d_iri * args["separator"]
 
@@ -274,7 +277,9 @@ function (@main)(ARGS)
             push!(operations, add_description(authorizing_d_ns, authorizing_prefix, args["path-base"]))
             push!(operations, create_instance(authorizing_d_iri, authority))
             push!(operations, add_assertion(authorizing_d_iri, authorizing_iri, RDF_TYPE, PROJECT))
+            push!(operations, add_assertion(authorizing_d_iri, authorizing_iri, HAS_PROJECT_IDENTIFIER, authority))
             push!(operations, add_assertion(authorizing_d_iri, authorizing_iri, HAS_CANONICAL_NAME, authority_data["hasName"][authority]))
+            push!(operations, add_assertion(authorizing_d_iri, authorizing_iri, HAS_SORT_KEY, "00"))
             push!(bundled, add_import(db_ns, authorizing_d_ns))
             
         end
