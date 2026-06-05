@@ -55,6 +55,9 @@ function parse_commandline()
         "--deferred"
         help = "Defer updates until the end (default: false)"
         action = :store_true
+        "--defer-diagnostics"
+        help = "Defer diagnostics until the end (default: false)"
+        action = :store_true
     end
     return parse_args(s)
 end
@@ -64,8 +67,8 @@ function is_alive(server)
     return resp.status == 200
 end
 
-function update(server, operations)
-    body = Dict("operations" => operations, "deferDiagnostics" => true)
+function update(server, operations, defer_diagnostics=false)
+    body = Dict("operations" => operations, "deferDiagnostics" => defer_diagnostics)
     resp = HTTP.post("$server/v0/update", headers=Dict("Content-Type" => "application/json"), body=JSON3.write(body))
     # open("/tmp/log.txt", "a") do log
     #     println(log, "Response: ", resp.status, " - ", String(resp.body))
@@ -372,7 +375,7 @@ function (@main)(ARGS)
             println("Deferred update for ", wp, " with ", length(operations), " operations")
         else
             t1 = time()
-            update(server, operations)
+            update(server, operations, args["defer-diagnostics"])
             t2 = time()
             println("Updated server for ", wp, " (", i, ") ", length(operations), " operations in ", round(t2 - t1, digits=2), " s")
             push!(updates, operations)
@@ -385,14 +388,14 @@ function (@main)(ARGS)
         println("Deferred update for description bundle with ", length(bundled), " operations")
     else
         t1 = time()
-        update(server, bundled)
+        update(server, bundled, args["defer-diagnostics"])
         t2 = time()
         println("Updated server for description bundle with ", length(bundled), " operations in ", round(t2 - t1, digits=2), " s")
     end
 
     if args["deferred"] && length(deferred) > 0
         t1 = time()
-        update(server, deferred)
+        update(server, deferred, args["defer-diagnostics"])
         t2 = time()
         println("Updated server with ", length(deferred), " operations in ", round(t2 - t1, digits=2), " s")
    end
