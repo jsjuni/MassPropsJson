@@ -9,6 +9,7 @@ const RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label"
 const DC_CREATOR = "http://purl.org/dc/elements/1.1/creator"
 const HAS_CANONICAL_NAME = "http://imce.jpl.nasa.gov/foundation/base#hasCanonicalName"
 const CONTAINS = "http://imce.jpl.nasa.gov/foundation/base#contains"
+const AUTHORIZES = "http://imce.jpl.nasa.gov/foundation/project#authorizes"
 const CHARACTERIZES = "http://imce.jpl.nasa.gov/foundation/analysis#characterizes"
 const WORK_PACKAGE = "http://imce.jpl.nasa.gov/foundation/project#WorkPackage"
 const PROJECT = "http://imce.jpl.nasa.gov/foundation/project#Project"
@@ -320,7 +321,11 @@ function (@main)(ARGS)
                 push!(operations, create_instance_ref(cd_iri, supplied_comp_iri))
             end
 
-             for (wp, comp) in authority_data["authorizes"]
+            # create ref for "authorizes" assertions
+
+            push!(operations, create_instance_ref(wpd_iri, authorizing_iri))
+
+            for (wp, comp) in authority_data["authorizes"]
 
                 # create work package
 
@@ -330,6 +335,7 @@ function (@main)(ARGS)
                 push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_CANONICAL_NAME, authority_data["hasName"][comp]))
                 push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_WORK_PACKAGE_IDENTIFIER, wp))
                 push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_SORT_KEY, authority_data["hasSortKey"][comp]))
+                push!(operations, add_assertion(wpd_iri, authorizing_iri, AUTHORIZES, child_wp_iri))
 
                 # create component
 
