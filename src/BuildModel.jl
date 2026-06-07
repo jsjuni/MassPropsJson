@@ -7,6 +7,7 @@ using HTTP
 const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 const RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label"
 const DC_CREATOR = "http://purl.org/dc/elements/1.1/creator"
+const DC_RIGHTS = "http://purl.org/dc/elements/1.1/rights"
 const HAS_CANONICAL_NAME = "http://imce.jpl.nasa.gov/foundation/base#hasCanonicalName"
 const CONTAINS = "http://imce.jpl.nasa.gov/foundation/base#contains"
 const AUTHORIZES = "http://imce.jpl.nasa.gov/foundation/project#authorizes"
@@ -339,6 +340,10 @@ function (@main)(ARGS)
                 push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_SORT_KEY, authority_data["hasSortKey"][comp]))
                 push!(operations, add_assertion(wpd_iri, authorizing_iri, AUTHORIZES, child_wp_iri))
 
+                # add rights for authorized work package
+
+                push!(operations, add_annotation(wpd_iri, wpd_iri, DC_RIGHTS, child_wp_iri))
+
                 # create component
 
                 push!(operations, create_instance(cd_iri, comp))
@@ -350,6 +355,10 @@ function (@main)(ARGS)
                 if (is_supplier)
                     push!(operations, add_assertion(cd_iri, supplied_comp_iri, CONTAINS, child_comp_iri))
                 end
+
+                # add rights for authorized work package
+                
+                push!(operations, add_annotation(cd_iri, cd_iri, DC_RIGHTS, child_wp_iri))
 
                 # add supplies relation from work package to component
 
@@ -366,6 +375,10 @@ function (@main)(ARGS)
                     push!(operations, add_assertion(qd_iri, q_iri, RDF_TYPE, "http://studioj.us/metrology#$kind"))
                     push!(operations, add_assertion(qd_iri, q_iri, CHARACTERIZES, child_comp_iri))
                 end
+
+                # add rights for authorized work package
+                
+                push!(operations, add_annotation(qd_iri, qd_iri, DC_RIGHTS, child_wp_iri))
 
             end
 
