@@ -262,6 +262,8 @@ function (@main)(ARGS)
 
             (supplied_comp_qd_iri, supplied_comp_qd_ns) = description_iri_ns(args["namespace-base"], "$authorizer/Q", args["separator"])
 
+            (supplied_comp_qvd_iri, supplied_comp_qvd_ns) = description_iri_ns(args["namespace-base"], "$authority/QV", args["separator"])
+
         else
 
             # top=level project description
@@ -388,7 +390,7 @@ function (@main)(ARGS)
 
         end
 
-        if false && is_supplier
+        if is_supplier
 
             # add quantity values
 
@@ -418,7 +420,7 @@ function (@main)(ARGS)
 
             # add authorization annotations to descriptions
 
-            push!(operations, add_authorization(supplied_comp_qvd_iri, authorizing_iri))
+            # push!(operations, add_authorization(supplied_comp_qvd_iri, authorizing_iri))
         end
 
         # update server
