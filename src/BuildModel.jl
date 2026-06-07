@@ -261,11 +261,11 @@ function (@main)(ARGS)
 
         if (is_supplier = haskey(authority_data, "supplies"))
 
-            authorizing_iri = authorizing_iri_frag * "/WP" * args["separator"] * authority
+            authorizing_iri = authorizing_iri_frag * "/WBS" * args["separator"] * authority
 
             # supplied component details
 
-            (supplied_comp_d_iri, supplied_comp_d_ns) = description_iri_ns(args["namespace-base"], "$authorizer/C", args["separator"])
+            (supplied_comp_d_iri, supplied_comp_d_ns) = description_iri_ns(args["namespace-base"], "$authorizer/SBS", args["separator"])
             supplied_comp_iri = instance_iri(supplied_comp_d_ns, authority_data["supplies"])
 
             (supplied_comp_qd_iri, supplied_comp_qd_ns) = description_iri_ns(args["namespace-base"], "$authorizer/Q", args["separator"])
@@ -295,13 +295,13 @@ function (@main)(ARGS)
 
             # description for components
 
-            (cd_iri, cd_ns) = description_iri_ns(args["namespace-base"], "$authority/C", args["separator"])
-            cd_prefix = authority * "_C"
+            (sbsd_iri, sbsd_ns) = description_iri_ns(args["namespace-base"], "$authority/SBS", args["separator"])
+            sbsd_prefix = authority * "_SBS"
 
             # description for work packages
 
-            (wpd_iri, wpd_ns) = description_iri_ns(args["namespace-base"], "$authority/WP", args["separator"])
-            wpd_prefix = authority * "_WP"
+            (wbsd_iri, wbsd_ns) = description_iri_ns(args["namespace-base"], "$authority/WBS", args["separator"])
+            wbsd_prefix = authority * "_WBS"
 
             # description for quantities
 
@@ -310,10 +310,10 @@ function (@main)(ARGS)
 
             # create descriptions
 
-            push!(operations, add_description(cd_ns, cd_prefix, args["path-base"]))
-            push!(deferred, add_import(db_ns, cd_ns))
-            push!(operations, add_description(wpd_ns, wpd_prefix, args["path-base"]))
-            push!(deferred, add_import(db_ns, wpd_ns))
+            push!(operations, add_description(sbsd_ns, sbsd_prefix, args["path-base"]))
+            push!(deferred, add_import(db_ns, sbsd_ns))
+            push!(operations, add_description(wbsd_ns, wbsd_prefix, args["path-base"]))
+            push!(deferred, add_import(db_ns, wbsd_ns))
             push!(operations, add_description(qd_ns, qd_prefix, args["path-base"]))
             push!(deferred, add_import(db_ns, qd_ns))
 
@@ -321,48 +321,48 @@ function (@main)(ARGS)
 
                 # create ref for "contains" assertions
 
-                push!(operations, create_instance_ref(cd_iri, supplied_comp_iri))
+                push!(operations, create_instance_ref(sbsd_iri, supplied_comp_iri))
             end
 
             # create ref for "authorizes" assertions
 
-            push!(operations, create_instance_ref(wpd_iri, authorizing_iri))
+            push!(operations, create_instance_ref(wbsd_iri, authorizing_iri))
 
             for (wp, comp) in authority_data["authorizes"]
 
                 # create work package
 
-                push!(operations, create_instance(wpd_iri, wp))
-                child_wp_iri = instance_iri(wpd_ns, wp)
-                push!(operations, add_assertion(wpd_iri, child_wp_iri, RDF_TYPE, WORK_PACKAGE))
-                push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_CANONICAL_NAME, authority_data["hasName"][comp]))
-                push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_WORK_PACKAGE_IDENTIFIER, wp))
-                push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_SORT_KEY, authority_data["hasSortKey"][comp]))
-                push!(operations, add_assertion(wpd_iri, authorizing_iri, AUTHORIZES, child_wp_iri))
+                push!(operations, create_instance(wbsd_iri, wp))
+                child_wp_iri = instance_iri(wbsd_ns, wp)
+                push!(operations, add_assertion(wbsd_iri, child_wp_iri, RDF_TYPE, WORK_PACKAGE))
+                push!(operations, add_assertion(wbsd_iri, child_wp_iri, HAS_CANONICAL_NAME, authority_data["hasName"][comp]))
+                push!(operations, add_assertion(wbsd_iri, child_wp_iri, HAS_WORK_PACKAGE_IDENTIFIER, wp))
+                push!(operations, add_assertion(wbsd_iri, child_wp_iri, HAS_SORT_KEY, authority_data["hasSortKey"][comp]))
+                push!(operations, add_assertion(wbsd_iri, authorizing_iri, AUTHORIZES, child_wp_iri))
 
                 # add rights for authorized work package
 
-                push!(operations, add_rights(wpd_iri, child_wp_iri))
+                push!(operations, add_rights(wbsd_iri, child_wp_iri))
 
                 # create component
 
-                push!(operations, create_instance(cd_iri, comp))
-                child_comp_iri = instance_iri(cd_ns, comp)
-                push!(operations, add_assertion(cd_iri, child_comp_iri, RDF_TYPE, COMPONENT))
-                push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_CANONICAL_NAME, authority_data["hasName"][comp]))
-                push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_COMPONENT_IDENTIFIER, comp))
-                push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_SORT_KEY, authority_data["hasSortKey"][comp]))
+                push!(operations, create_instance(sbsd_iri, comp))
+                child_comp_iri = instance_iri(sbsd_ns, comp)
+                push!(operations, add_assertion(sbsd_iri, child_comp_iri, RDF_TYPE, COMPONENT))
+                push!(operations, add_assertion(sbsd_iri, child_comp_iri, HAS_CANONICAL_NAME, authority_data["hasName"][comp]))
+                push!(operations, add_assertion(sbsd_iri, child_comp_iri, HAS_COMPONENT_IDENTIFIER, comp))
+                push!(operations, add_assertion(sbsd_iri, child_comp_iri, HAS_SORT_KEY, authority_data["hasSortKey"][comp]))
                 if (is_supplier)
-                    push!(operations, add_assertion(cd_iri, supplied_comp_iri, CONTAINS, child_comp_iri))
+                    push!(operations, add_assertion(sbsd_iri, supplied_comp_iri, CONTAINS, child_comp_iri))
                 end
 
                 # add rights for authorized work package
                 
-                push!(operations, add_rights(cd_iri, child_wp_iri))
+                push!(operations, add_rights(sbsd_iri, child_wp_iri))
 
                 # add supplies relation from work package to component
 
-                push!(operations, add_assertion(wpd_iri, child_wp_iri, SUPPLIES, child_comp_iri))
+                push!(operations, add_assertion(wbsd_iri, child_wp_iri, SUPPLIES, child_comp_iri))
 
                 # create mass property quantities
 
@@ -392,8 +392,8 @@ function (@main)(ARGS)
 
             # add authorization annotations to descriptions
 
-            push!(operations, add_authorization(cd_iri, authorizing_iri))
-            push!(operations, add_authorization(wpd_iri, authorizing_iri))
+            push!(operations, add_authorization(sbsd_iri, authorizing_iri))
+            push!(operations, add_authorization(wbsd_iri, authorizing_iri))
             push!(operations, add_authorization(qd_iri, authorizing_iri))
 
         end
