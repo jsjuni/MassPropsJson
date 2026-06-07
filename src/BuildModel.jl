@@ -332,7 +332,7 @@ function (@main)(ARGS)
                 # create work package
 
                 push!(operations, create_instance(wpd_iri, wp))
-                child_wp_iri = wpd_ns * String(wp)
+                child_wp_iri = instance_iri(wpd_ns, wp)
                 push!(operations, add_assertion(wpd_iri, child_wp_iri, RDF_TYPE, WORK_PACKAGE))
                 push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_CANONICAL_NAME, authority_data["hasName"][comp]))
                 push!(operations, add_assertion(wpd_iri, child_wp_iri, HAS_WORK_PACKAGE_IDENTIFIER, wp))
@@ -342,7 +342,7 @@ function (@main)(ARGS)
                 # create component
 
                 push!(operations, create_instance(cd_iri, comp))
-                child_comp_iri = cd_ns * String(comp)
+                child_comp_iri = instance_iri(cd_ns, comp)
                 push!(operations, add_assertion(cd_iri, child_comp_iri, RDF_TYPE, COMPONENT))
                 push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_CANONICAL_NAME, authority_data["hasName"][comp]))
                 push!(operations, add_assertion(cd_iri, child_comp_iri, HAS_COMPONENT_IDENTIFIER, comp))
@@ -359,7 +359,7 @@ function (@main)(ARGS)
 
                 for (quantity, kind) in quantity_map
                     q_name = comp * "_" * quantity
-                    q_iri = qd_ns * q_name
+                    q_iri = instance_iri(qd_ns, q_name)
                     push!(operations, create_instance(qd_iri, q_name))
                     push!(operations, add_annotation(qd_iri, q_iri, RDFS_LABEL, quantity))
                     push!(operations, add_assertion(qd_iri, q_iri, HAS_QUANTITY_IDENTIFIER, q_name))
@@ -384,8 +384,8 @@ function (@main)(ARGS)
             for (quantity, kind) in quantity_map
                 q_name = authority_data["supplies"] * "_" * quantity
                 qv_name = q_name * "_value"
-                q_iri = supplied_comp_qd_ns * q_name
-                qv_iri = supplied_comp_qvd_ns * qv_name
+                q_iri = instance_iri(supplied_comp_qd_ns, q_name)
+                qv_iri = instance_iri(supplied_comp_qvd_ns, qv_name)
                 qtype = replace(kind, "Quantity" => "Value")
                 push!(operations, create_instance(supplied_comp_qvd_iri, qv_name))
                 push!(operations, add_annotation(supplied_comp_qvd_iri, qv_iri, RDFS_LABEL, quantity))
