@@ -56,9 +56,6 @@ function parse_commandline()
         help = "Namespace separator (default: #)"
         arg_type = String
         default = "#"
-        "--deferred"
-        help = "Defer updates until the end (default: false)"
-        action = :store_true
         "--defer-diagnostics"
         help = "Defer diagnostics until the end (default: false)"
         action = :store_true
@@ -230,14 +227,13 @@ function (@main)(ARGS)
     end
 
     deferred = []
-    updates = []
 
     # create description bundle
 
     (db_iri, db_ns) = description_iri_ns(args["namespace-base"], "bundle", args["separator"])
     db_prefix = "description-bundle"
 
-    bundled = [add_description_bundle(db_ns, db_prefix, args["path-base"])]
+    push!(deferred, add_description_bundle(db_ns, db_prefix, args["path-base"]))
 
     for (i, v) in enumerate(vl)
         if args["limit"] > 0 && i > args["limit"]
@@ -266,12 +262,6 @@ function (@main)(ARGS)
 
             (supplied_comp_qd_iri, supplied_comp_qd_ns) = description_iri_ns(args["namespace-base"], "$authorizer/Q", args["separator"])
 
-            (supplied_comp_qvd_iri, supplied_comp_qvd_ns) = description_iri_ns(args["namespace-base"], "$authority/QV", args["separator"])
-            supplied_comp_qvd_prefix = authority * "_QV"
-
-            push!(operations, add_description(supplied_comp_qvd_ns, supplied_comp_qvd_prefix, args["path-base"]))
-            push!(bundled, add_import(db_ns, supplied_comp_qvd_ns))
-
         else
 
             # top=level project description
@@ -287,7 +277,7 @@ function (@main)(ARGS)
             push!(operations, add_assertion(authorizing_d_iri, authorizing_iri, HAS_PROJECT_IDENTIFIER, authority))
             push!(operations, add_assertion(authorizing_d_iri, authorizing_iri, HAS_CANONICAL_NAME, authority_data["hasName"][authority]))
             push!(operations, add_assertion(authorizing_d_iri, authorizing_iri, HAS_SORT_KEY, "00"))
-            push!(bundled, add_import(db_ns, authorizing_d_ns))
+            push!(deferred, add_import(db_ns, authorizing_d_ns))
             
         end
 
@@ -311,11 +301,11 @@ function (@main)(ARGS)
             # create descriptions
 
             push!(operations, add_description(cd_ns, cd_prefix, args["path-base"]))
-            push!(bundled, add_import(db_ns, cd_ns))
+            push!(deferred, add_import(db_ns, cd_ns))
             push!(operations, add_description(wpd_ns, wpd_prefix, args["path-base"]))
-            push!(bundled, add_import(db_ns, wpd_ns))
+            push!(deferred, add_import(db_ns, wpd_ns))
             push!(operations, add_description(qd_ns, qd_prefix, args["path-base"]))
-            push!(bundled, add_import(db_ns, qd_ns))
+            push!(deferred, add_import(db_ns, qd_ns))
 
             if is_supplier
 
@@ -364,7 +354,7 @@ function (@main)(ARGS)
 
                 push!(operations, add_assertion(wpd_iri, child_wp_iri, SUPPLIES, child_comp_iri))
 
-                # create mass property quantities and quantity values
+                # create mass property quantities
 
                 for (quantity, kind) in quantity_map
                     q_name = comp * "_" * quantity
@@ -380,6 +370,14 @@ function (@main)(ARGS)
                 
                 push!(operations, add_annotation(qd_iri, qd_iri, DC_RIGHTS, child_wp_iri))
 
+                # create quantity value description for child workpackage
+
+                (child_qvd_iri, child_qvd_ns) = description_iri_ns(args["namespace-base"], "$wp/QV", args["separator"])
+                child_qvd_prefix = String(wp) * "_QV"
+                push!(operations, add_description(child_qvd_ns, child_qvd_prefix, args["path-base"]))
+                push!(operations, add_authorization(child_qvd_iri, child_wp_iri))
+                push!(deferred, add_annotation(child_qvd_iri, child_qvd_iri, DC_RIGHTS, authorizing_iri))
+                push!(deferred, add_import(db_ns, child_qvd_ns))
             end
 
             # add authorization annotations to descriptions
@@ -390,7 +388,7 @@ function (@main)(ARGS)
 
         end
 
-        if is_supplier
+        if false && is_supplier
 
             # add quantity values
 
@@ -425,36 +423,17 @@ function (@main)(ARGS)
 
         # update server
         
-        if args["deferred"]
-            push!(deferred, operations...)
-            println("Deferred update for ", authority, " with ", length(operations), " operations")
-        else
-            t1 = time()
-            update(server, operations, args["defer-diagnostics"])
-            t2 = time()
-            println("Updated server for ", authority, " (", i, ") ", length(operations), " operations in ", round(t2 - t1, digits=2), " s")
-            push!(updates, operations)
-        end
+        t1 = time()
+        update(server, operations, args["defer-diagnostics"])
+        t2 = time()
+        println("Updated server for ", authority, " (", i, ") ", length(operations), " operations in ", round(t2 - t1, digits=2), " s")
 
     end
 
-    if args["deferred"]
-        push!(deferred, bundled)
-        println("Deferred update for description bundle with ", length(bundled), " operations")
-    else
-        t1 = time()
-        update(server, bundled, args["defer-diagnostics"])
-        t2 = time()
-        println("Updated server for description bundle with ", length(bundled), " operations in ", round(t2 - t1, digits=2), " s")
-    end
-
-    if args["deferred"] && length(deferred) > 0
-        t1 = time()
-        update(server, deferred, args["defer-diagnostics"])
-        t2 = time()
-        println("Updated server with ", length(deferred), " operations in ", round(t2 - t1, digits=2), " s")
-   end
-
+    t1 = time()
+    update(server, deferred, args["defer-diagnostics"])
+    t2 = time()
+    println("Updated server for description bundle with ", length(deferred), " operations in ", round(t2 - t1, digits=2), " s")
     end_time = time()
     println("finished in ", round(end_time - start_time, digits=2), " s")
 
