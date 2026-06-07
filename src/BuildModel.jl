@@ -173,6 +173,16 @@ function xsd_double(value)
     "$value"
 end
 
+function description_iri_ns(base, path, separator)
+    iri = base * replace("/$path", r"\/+" => "/")
+    ns = iri * separator
+    (iri, ns)
+end
+
+function instance_iri(namespace, name)
+    namespace * String(name)
+end
+
 function (@main)(ARGS)
 
     quantity_map = Dict(
@@ -223,8 +233,7 @@ function (@main)(ARGS)
 
     # create description bundle
 
-    db_iri = args["namespace-base"] * "/bundle"
-    db_ns = db_iri = db_iri * args["separator"]
+    (db_iri, db_ns) = description_iri_ns(args["namespace-base"], "bundle", args["separator"])
     db_prefix = "description-bundle"
 
     bundled = [add_description_bundle(db_ns, db_prefix, args["path-base"])]
@@ -251,15 +260,12 @@ function (@main)(ARGS)
 
             # supplied component details
 
-            supplied_comp_d_iri = authorizing_iri_frag * "/C"
-            supplied_comp_d_ns = supplied_comp_d_iri * args["separator"]
-            supplied_comp_iri = supplied_comp_d_ns * authority_data["supplies"]
-    
-            supplied_comp_qd_iri = authorizing_iri_frag * "/Q"
-            supplied_comp_qd_ns = supplied_comp_qd_iri * args["separator"]
+            (supplied_comp_d_iri, supplied_comp_d_ns) = description_iri_ns(args["namespace-base"], "$authorizer/C", args["separator"])
+            supplied_comp_iri = instance_iri(supplied_comp_d_ns, authority_data["supplies"])
 
-            supplied_comp_qvd_iri = args["namespace-base"] * "/" * authority * "/QV"
-            supplied_comp_qvd_ns = supplied_comp_qvd_iri * args["separator"]
+            (supplied_comp_qd_iri, supplied_comp_qd_ns) = description_iri_ns(args["namespace-base"], "$authorizer/Q", args["separator"])
+
+            (supplied_comp_qvd_iri, supplied_comp_qvd_ns) = description_iri_ns(args["namespace-base"], "$authority/QV", args["separator"])
             supplied_comp_qvd_prefix = authority * "_QV"
 
             push!(operations, add_description(supplied_comp_qvd_ns, supplied_comp_qvd_prefix, args["path-base"]))
@@ -269,13 +275,12 @@ function (@main)(ARGS)
 
             # top=level project description
 
-            authorizing_d_iri = authorizing_iri_frag * "/P"
-            authorizing_d_ns = authorizing_d_iri * args["separator"]
+            (authorizing_d_iri, authorizing_d_ns) = description_iri_ns(args["namespace-base"], "$authorizer/P", args["separator"])
+            authorizing_d_prefix = authority * "_P"
 
-            authorizing_iri = authorizing_d_ns * authority
-            authorizing_prefix = authority * "_P"
+            authorizing_iri = instance_iri(authorizing_d_ns, authority)
 
-            push!(operations, add_description(authorizing_d_ns, authorizing_prefix, args["path-base"]))
+            push!(operations, add_description(authorizing_d_ns, authorizing_d_prefix, args["path-base"]))
             push!(operations, create_instance(authorizing_d_iri, authority))
             push!(operations, add_assertion(authorizing_d_iri, authorizing_iri, RDF_TYPE, PROJECT))
             push!(operations, add_assertion(authorizing_d_iri, authorizing_iri, HAS_PROJECT_IDENTIFIER, authority))
@@ -289,20 +294,17 @@ function (@main)(ARGS)
 
             # description for components
 
-            cd_iri = args["namespace-base"] * "/" * authority * "/C"
-            cd_ns = cd_iri * args["separator"]
+            (cd_iri, cd_ns) = description_iri_ns(args["namespace-base"], "$authority/C", args["separator"])
             cd_prefix = authority * "_C"
 
             # description for work packages
 
-            wpd_iri = args["namespace-base"] * "/" * authority * "/WP"
-            wpd_ns = wpd_iri * args["separator"]
+            (wpd_iri, wpd_ns) = description_iri_ns(args["namespace-base"], "$authority/WP", args["separator"])
             wpd_prefix = authority * "_WP"
 
             # description for quantities
 
-            qd_iri = args["namespace-base"] * "/" * authority * "/Q"
-            qd_ns = qd_iri * args["separator"]
+            (qd_iri, qd_ns) = description_iri_ns(args["namespace-base"], "$authority/Q", args["separator"])
             qd_prefix = authority * "_Q"
 
             # create descriptions
