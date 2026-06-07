@@ -116,15 +116,23 @@ function add_import(importing, imported)
     )
 end
 
-function add_authorization(iri, authorizer)
+function add_annotation(ontologyIri, subjectIri, predicateIri, object)
     Dict(
         "addAnnotation" => Dict(
-            "ontologyIri" => iri,
-            "subjectIri" => iri,
-            "predicateIri" => DC_CREATOR,
-            "object" => authorizer
+            "ontologyIri" => ontologyIri,
+            "subjectIri" => subjectIri,
+            "predicateIri" => predicateIri,
+            "object" => object
         )
     )
+end
+
+function add_authorization(iri, authorizer)
+    add_annotation(iri, iri, DC_CREATOR, Dict("datatypeIri" => "http://www.w3.org/2001/XMLSchema#anyURI", "value" => authorizer))
+end
+
+function add_rights(iri, grantee)
+    add_annotation(iri, iri, DC_RIGHTS, Dict("datatypeIri" => "http://www.w3.org/2001/XMLSchema#anyURI", "value" => grantee))
 end
 
 function create_instance(description_iri, name)
@@ -334,7 +342,7 @@ function (@main)(ARGS)
 
                 # add rights for authorized work package
 
-                push!(operations, add_annotation(wpd_iri, wpd_iri, DC_RIGHTS, child_wp_iri))
+                push!(operations, add_rights(wpd_iri, child_wp_iri))
 
                 # create component
 
@@ -350,7 +358,7 @@ function (@main)(ARGS)
 
                 # add rights for authorized work package
                 
-                push!(operations, add_annotation(cd_iri, cd_iri, DC_RIGHTS, child_wp_iri))
+                push!(operations, add_rights(cd_iri, child_wp_iri))
 
                 # add supplies relation from work package to component
 
@@ -370,7 +378,7 @@ function (@main)(ARGS)
 
                 # add rights for authorized work package
                 
-                push!(operations, add_annotation(qd_iri, qd_iri, DC_RIGHTS, child_wp_iri))
+                push!(operations, add_rights(qd_iri, child_wp_iri))
 
                 # create quantity value description for child workpackage
 
@@ -378,7 +386,7 @@ function (@main)(ARGS)
                 child_qvd_prefix = String(wp) * "_QV"
                 push!(operations, add_description(child_qvd_ns, child_qvd_prefix, args["path-base"]))
                 push!(operations, add_authorization(child_qvd_iri, child_wp_iri))
-                push!(deferred, add_annotation(child_qvd_iri, child_qvd_iri, DC_RIGHTS, authorizing_iri))
+                push!(deferred, add_rights(child_qvd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_qvd_ns))
             end
 
