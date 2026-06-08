@@ -305,8 +305,8 @@ function (@main)(ARGS)
 
             # description for quantities
 
-            (qd_iri, qd_ns) = description_iri_ns(args["namespace-base"], "$authority/Q", args["separator"])
-            qd_prefix = authority * "_Q"
+            # (qd_iri, qd_ns) = description_iri_ns(args["namespace-base"], "$authority/Q", args["separator"])
+            # qd_prefix = authority * "_Q"
 
             # create descriptions
 
@@ -314,8 +314,8 @@ function (@main)(ARGS)
             push!(deferred, add_import(db_ns, sbsd_ns))
             push!(operations, add_description(wbsd_ns, wbsd_prefix, args["path-base"]))
             push!(deferred, add_import(db_ns, wbsd_ns))
-            push!(operations, add_description(qd_ns, qd_prefix, args["path-base"]))
-            push!(deferred, add_import(db_ns, qd_ns))
+            # push!(operations, add_description(qd_ns, qd_prefix, args["path-base"]))
+            # push!(deferred, add_import(db_ns, qd_ns))
 
             if is_supplier
 
@@ -382,17 +382,17 @@ function (@main)(ARGS)
 
                 for (quantity, kind) in quantity_map
                     q_name = comp * "_" * quantity
-                    q_iri = instance_iri(qd_ns, q_name)
-                    push!(operations, create_instance(qd_iri, q_name))
-                    push!(operations, add_annotation(qd_iri, q_iri, RDFS_LABEL, quantity))
-                    push!(operations, add_assertion(qd_iri, q_iri, HAS_QUANTITY_IDENTIFIER, q_name))
-                    push!(operations, add_assertion(qd_iri, q_iri, RDF_TYPE, "http://studioj.us/metrology#$kind"))
-                    push!(operations, add_assertion(qd_iri, q_iri, CHARACTERIZES, child_comp_iri))
+                    q_iri = instance_iri(child_cd_ns, q_name)
+                    push!(operations, create_instance(child_cd_iri, q_name))
+                    push!(operations, add_annotation(child_cd_iri, q_iri, RDFS_LABEL, quantity))
+                    push!(operations, add_assertion(child_cd_iri, q_iri, HAS_QUANTITY_IDENTIFIER, q_name))
+                    push!(operations, add_assertion(child_cd_iri, q_iri, RDF_TYPE, "http://studioj.us/metrology#$kind"))
+                    push!(operations, add_assertion(child_cd_iri, q_iri, CHARACTERIZES, child_comp_iri))
                 end
 
                 # add rights for authorized work package
                 
-                push!(operations, add_rights(qd_iri, child_wp_iri))
+                # push!(operations, add_rights(qd_iri, child_wp_iri))
 
                 # create quantity value description for child workpackage
 
@@ -402,13 +402,14 @@ function (@main)(ARGS)
                 push!(operations, add_authorization(child_qvd_iri, child_wp_iri))
                 push!(deferred, add_rights(child_qvd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_qvd_ns))
+
             end
 
             # add authorization annotations to descriptions
 
             push!(operations, add_authorization(sbsd_iri, authorizing_iri))
             push!(operations, add_authorization(wbsd_iri, authorizing_iri))
-            push!(operations, add_authorization(qd_iri, authorizing_iri))
+            # push!(operations, add_authorization(qd_iri, authorizing_iri))
 
         end
 
