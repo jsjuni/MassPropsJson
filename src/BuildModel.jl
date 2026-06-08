@@ -335,6 +335,7 @@ function (@main)(ARGS)
                 (child_wpd_iri, child_wpd_ns) = description_iri_ns(args["namespace-base"], "$authority/WP/$wp", args["separator"])
                 child_wpd_prefix = wp
                 push!(operations, add_description(child_wpd_ns, child_wpd_prefix, args["path-base"]))
+                push!(operations, add_authorization(child_wpd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_wpd_ns))
 
                 # create work package
@@ -356,6 +357,7 @@ function (@main)(ARGS)
                 (child_cd_iri, child_cd_ns) = description_iri_ns(args["namespace-base"], "$authority/C/$comp", args["separator"])
                 child_cd_prefix = comp
                 push!(operations, add_description(child_cd_ns, child_cd_prefix, args["path-base"]))
+                push!(operations, add_authorization(child_cd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_cd_ns))
 
                 # create component
@@ -409,7 +411,6 @@ function (@main)(ARGS)
 
             push!(operations, add_authorization(sbsd_iri, authorizing_iri))
             push!(operations, add_authorization(wbsd_iri, authorizing_iri))
-            # push!(operations, add_authorization(qd_iri, authorizing_iri))
 
         end
 
@@ -420,7 +421,7 @@ function (@main)(ARGS)
             for (quantity, kind) in quantity_map
                 q_name = authority_data["supplies"] * "_" * quantity
                 qv_name = q_name * "_value"
-                q_iri = instance_iri(supplied_comp_qd_ns, q_name)
+                q_iri = instance_iri(supplied_comp_d_ns, q_name)
                 qv_iri = instance_iri(supplied_comp_qvd_ns, qv_name)
                 qtype = replace(kind, "Quantity" => "Value")
                 push!(operations, create_instance(supplied_comp_qvd_iri, qv_name))
@@ -441,9 +442,6 @@ function (@main)(ARGS)
             push!(operations, add_assertion(supplied_comp_qvd_iri, supplied_comp_iri, HAS_POI_CONVENTION, authority_data["hasPOIconv"]))
             push!(operations, add_assertion(supplied_comp_qvd_iri, supplied_comp_iri, IS_POINT_MASS, authority_data["isPointMass"]))
 
-            # add authorization annotations to descriptions
-
-            # push!(operations, add_authorization(supplied_comp_qvd_iri, authorizing_iri))
         end
 
         # update server
