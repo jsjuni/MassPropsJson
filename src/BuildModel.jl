@@ -265,7 +265,7 @@ function (@main)(ARGS)
 
             # supplied component details
 
-            (supplied_comp_d_iri, supplied_comp_d_ns) = description_iri_ns(args["namespace-base"], "$authorizer/SBS", args["separator"])
+            (supplied_comp_d_iri, supplied_comp_d_ns) = description_iri_ns(args["namespace-base"], "$authorizer/C/" * authority_data["supplies"], args["separator"])
             supplied_comp_iri = instance_iri(supplied_comp_d_ns, authority_data["supplies"])
 
             (supplied_comp_qd_iri, supplied_comp_qd_ns) = description_iri_ns(args["namespace-base"], "$authorizer/Q", args["separator"])
@@ -351,21 +351,28 @@ function (@main)(ARGS)
 
                 push!(operations, add_rights(child_wpd_iri, child_wp_iri))
 
+                # create component description
+
+                (child_cd_iri, child_cd_ns) = description_iri_ns(args["namespace-base"], "$authority/C/$comp", args["separator"])
+                child_cd_prefix = comp
+                push!(operations, add_description(child_cd_ns, child_cd_prefix, args["path-base"]))
+                push!(deferred, add_import(db_ns, child_cd_ns))
+
                 # create component
 
-                push!(operations, create_instance(sbsd_iri, comp))
-                child_comp_iri = instance_iri(sbsd_ns, comp)
-                push!(operations, add_assertion(sbsd_iri, child_comp_iri, RDF_TYPE, COMPONENT))
-                push!(operations, add_assertion(sbsd_iri, child_comp_iri, HAS_CANONICAL_NAME, authority_data["hasName"][comp]))
-                push!(operations, add_assertion(sbsd_iri, child_comp_iri, HAS_COMPONENT_IDENTIFIER, comp))
-                push!(operations, add_assertion(sbsd_iri, child_comp_iri, HAS_SORT_KEY, authority_data["hasSortKey"][comp]))
+                push!(operations, create_instance(child_cd_iri, comp))
+                child_comp_iri = instance_iri(child_cd_ns, comp)
+                push!(operations, add_assertion(child_cd_iri, child_comp_iri, RDF_TYPE, COMPONENT))
+                push!(operations, add_assertion(child_cd_iri, child_comp_iri, HAS_CANONICAL_NAME, authority_data["hasName"][comp]))
+                push!(operations, add_assertion(child_cd_iri, child_comp_iri, HAS_COMPONENT_IDENTIFIER, comp))
+                push!(operations, add_assertion(child_cd_iri, child_comp_iri, HAS_SORT_KEY, authority_data["hasSortKey"][comp]))
                 if (is_supplier)
                     push!(operations, add_assertion(sbsd_iri, supplied_comp_iri, CONTAINS, child_comp_iri))
                 end
 
                 # add rights for authorized work package
                 
-                push!(operations, add_rights(sbsd_iri, child_wp_iri))
+                push!(operations, add_rights(child_cd_iri, child_wp_iri))
 
                 # add supplies relation from work package to component
 
