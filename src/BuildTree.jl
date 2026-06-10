@@ -9,6 +9,8 @@ module Main
     using Random
     using OrderedCollections
     using Printf
+    using CSV
+    using DataFrames
 
     LEVELS = [ "System", "Segment", "Element", "Subsystem", "Assembly", "Subassembly", "Part" ]
 
@@ -35,6 +37,10 @@ module Main
                 help = "Output JSON file (default: output.json)"
                 arg_type = String
                 default = ""
+            "--table"
+                help = "Input table (CSV)"
+                arg_type = String
+                required = true
         end
         return parse_args(s)
     end
@@ -61,10 +67,40 @@ module Main
         isempty(pl) ? wp : pl[1]
     end
 
+    function sample_props(table)
+        row = table[rand(1:nrow(table)), :]
+        OrderedDict(
+            "mass" => string(row["mass"]),
+            "Cx" => string(row["Cx"]),
+            "Cy" => string(row["Cy"]),
+            "Cz" => string(row["Cz"]),
+            "Ixx" => string(row["Ixx"]),
+            "Iyy" => string(row["Iyy"]),
+            "Izz" => string(row["Izz"]),
+            "Ixy" => string(row["Ixy"]),
+            "Ixz" => string(row["Ixz"]),
+            "Iyz" => string(row["Iyz"]),
+            "Ipoint" => row["Ipoint"],
+            "sigma_mass" => string(row["sigma_mass"]),
+            "sigma_Cx" => string(row["sigma_Cx"]),
+            "sigma_Cy" => string(row["sigma_Cy"]),
+            "sigma_Cz" => string(row["sigma_Cz"]),
+            "sigma_Ixx" => string(row["sigma_Ixx"]),
+            "sigma_Iyy" => string(row["sigma_Iyy"]),
+            "sigma_Izz" => string(row["sigma_Izz"]),
+            "sigma_Ixy" => string(row["sigma_Ixy"]),
+            "sigma_Ixz" => string(row["sigma_Ixz"]),
+            "sigma_Iyz" => string(row["sigma_Iyz"])
+                    )
+    end
+
     function (@main)(ARGS)
         
         @info "begin BuildTree"
         args = parse_commandline()
+    
+        @info "load property table"
+        table = subset(CSV.read(open(args["table"], "r"), DataFrame; missingstring = "NA"), :mass => m -> .!ismissing.(m))
     
         @info "seed rng" args["seed"]
         Random.seed!(args["seed"])
@@ -80,6 +116,7 @@ module Main
         g = tree = MetaGraphsNext.MetaGraph(Graphs.DiGraph(), label_type = String)
 
         project = "P.1"
+        assigned_name[project] = "Project"
         add_vertex!(g, project)
 
         todo = Queue{String}()
@@ -121,15 +158,17 @@ module Main
         @info "build dictionary"
         order = topological_sort(tree)
         wpl = map(v -> label_for(tree, v), order)
-        wpd = OrderedCollections.OrderedDict{String, Dict{String, Any}}()
+        wpd = OrderedCollections.OrderedDict{String, OrderedDict{String, Any}}()
         for wp in wpl
-            wpd[wp] = d = Dict{String, Any}()
-            d["supplies"] = comp_from_wp(wp)
+            wpd[wp] = d = OrderedDict{String, Any}()
+            if wp != project
+                d["supplies"] = comp_from_wp(wp)
+            end
             children = outneighbor_labels(g, wp)
             d["authorizes"] = reduce(
                 merge,
                 map(
-                    p -> Dict(p => comp_from_wp(p)),
+                    p -> OrderedDict(p => comp_from_wp(p)),
                     children
                 ),
                 init = OrderedDict()
@@ -137,15 +176,18 @@ module Main
             d["hasName"] = reduce(
                     merge,
                     map(
-                        p -> Dict(comp_from_wp(p) => assigned_name[p]),
+                        p -> OrderedDict(comp_from_wp(p) => assigned_name[p]),
                         children
                     ),
                 init = OrderedDict()
             )
+            if wp == project
+                d["hasName"][project] = assigned_name[project]
+            end
             d["hasSortKey"] = reduce(
                 merge, 
                 map(
-                    p -> Dict(
+                    p -> OrderedDict(
                         comp_from_wp(p) => join(
                             map(
                                 x -> @sprintf("%02d", parse(Int, x)), split(comp_from_wp(p), ".")[2:end]
@@ -159,6 +201,9 @@ module Main
             d["isAuthorizedBy"] = authorizer(g, wp)
             d["hasPOIconv"] = "-"
             d["isPointMass"] = false
+            if isempty(d["authorizes"])
+                d["hasValues"] = sample_props(table)
+            end
         end
 
         @info "serialize dictionary"
