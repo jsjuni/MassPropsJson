@@ -126,10 +126,34 @@ module Main
             wpd[wp] = d = Dict{String, Any}()
             d["supplies"] = comp_from_wp(wp)
             children = outneighbor_labels(g, wp)
-            d["authorizes"] = reduce(merge, map(p -> Dict(p => comp_from_wp(p)), children), init = OrderedDict())
-            d["hasName"] = reduce(merge, map(p -> Dict(comp_from_wp(p) => assigned_name[p]), children), init = OrderedDict())
-            d["hasSortKey"] = reduce(merge, 
-                map(p -> Dict(comp_from_wp(p) => join(map(x -> @sprintf("%02d", parse(Int, x)), split(comp_from_wp(p), ".")[2:end]))), children),
+            d["authorizes"] = reduce(
+                merge,
+                map(
+                    p -> Dict(p => comp_from_wp(p)),
+                    children
+                ),
+                init = OrderedDict()
+            )
+            d["hasName"] = reduce(
+                    merge,
+                    map(
+                        p -> Dict(comp_from_wp(p) => assigned_name[p]),
+                        children
+                    ),
+                init = OrderedDict()
+            )
+            d["hasSortKey"] = reduce(
+                merge, 
+                map(
+                    p -> Dict(
+                        comp_from_wp(p) => join(
+                            map(
+                                x -> @sprintf("%02d", parse(Int, x)), split(comp_from_wp(p), ".")[2:end]
+                            )
+                        )
+                    ),
+                    children
+                ),
                 init = OrderedDict()
             )
             d["isAuthorizedBy"] = authorizer(g, wp)
