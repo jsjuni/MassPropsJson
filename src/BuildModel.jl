@@ -16,6 +16,7 @@ const CHARACTERIZES = "http://imce.jpl.nasa.gov/foundation/analysis#characterize
 const WORK_PACKAGE = "http://imce.jpl.nasa.gov/foundation/project#WorkPackage"
 const PROJECT = "http://imce.jpl.nasa.gov/foundation/project#Project"
 const COMPONENT = "http://imce.jpl.nasa.gov/foundation/mission#Component"
+const ITEM = "http://imce.jpl.nasa.gov/foundation/mission#Item"
 const INTERFACE = "http://imce.jpl.nasa.gov/foundation/mission#Interface"
 const SUPPLIES = "http://imce.jpl.nasa.gov/foundation/project#supplies"
 const HAS_NUMBER = "<http://studioj.us/metrology#hasNumber>"
@@ -323,6 +324,24 @@ function (@main)(ARGS)
 
             push!(operations, create_instance_ref(wbsd_iri, authorizing_iri))
 
+
+            # create items descriptions
+
+            for item in authority_data["items"]
+                (child_itd_iri, child_itd_ns) = description_iri_ns(args["namespace-base"], "$authority/IT/$item", args["separator"])
+                child_itd_prefix = "$item"
+
+                push!(operations, add_description(child_itd_ns, child_itd_prefix, args["path-base"]))
+                push!(operations, add_authorization(child_itd_iri, authorizing_iri))
+                push!(deferred, add_import(db_ns, child_itd_ns))
+
+                # add item
+
+                item_iri = instance_iri(child_itd_ns, item)
+                push!(operations, create_instance(child_itd_iri, item))
+                push!(operations, add_assertion(child_itd_iri, item_iri, RDF_TYPE, ITEM))
+            end
+            
             for (wp, comp) in authority_data["authorizes"]
 
                 # create work package description
@@ -386,19 +405,6 @@ function (@main)(ARGS)
                     push!(operations, add_assertion(child_cd_iri, child_comp_iri, PRESENTS, if_iri))
                 end
 
-                # create items description
-
-                (child_itd_iri, child_itd_ns) = description_iri_ns(args["namespace-base"], "$authority/IT/IT.$comp", args["separator"])
-                child_itd_prefix = "IT.$comp"
-
-                push!(operations, add_description(child_itd_ns, child_itd_prefix, args["path-base"]))
-                push!(operations, add_authorization(child_itd_iri, authorizing_iri))
-                push!(deferred, add_import(db_ns, child_itd_ns))
-
-                # add rights for items description
-                
-                push!(operations, add_rights(child_itd_iri, child_wp_iri))
-
                 # create mass property quantities
 
                 for (quantity, kind) in quantity_map
@@ -426,7 +432,7 @@ function (@main)(ARGS)
 
             push!(operations, add_authorization(sbsd_iri, authorizing_iri))
             push!(operations, add_authorization(wbsd_iri, authorizing_iri))
-
+           
         end
 
         if is_supplier
