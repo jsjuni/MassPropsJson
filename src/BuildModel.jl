@@ -10,11 +10,13 @@ const DC_CREATOR = "http://purl.org/dc/elements/1.1/creator"
 const DC_RIGHTS = "http://purl.org/dc/elements/1.1/rights"
 const HAS_CANONICAL_NAME = "http://imce.jpl.nasa.gov/foundation/base#hasCanonicalName"
 const CONTAINS = "http://imce.jpl.nasa.gov/foundation/base#contains"
+const PRESENTS = "http://imce.jpl.nasa.gov/foundation/mission#presents"
 const AUTHORIZES = "http://imce.jpl.nasa.gov/foundation/project#authorizes"
 const CHARACTERIZES = "http://imce.jpl.nasa.gov/foundation/analysis#characterizes"
 const WORK_PACKAGE = "http://imce.jpl.nasa.gov/foundation/project#WorkPackage"
 const PROJECT = "http://imce.jpl.nasa.gov/foundation/project#Project"
 const COMPONENT = "http://imce.jpl.nasa.gov/foundation/mission#Component"
+const INTERFACE = "http://imce.jpl.nasa.gov/foundation/mission#Interface"
 const SUPPLIES = "http://imce.jpl.nasa.gov/foundation/project#supplies"
 const HAS_NUMBER = "<http://studioj.us/metrology#hasNumber>"
 const HAS_UNIT = "<http://studioj.us/metrology#hasUnit>"
@@ -372,6 +374,17 @@ function (@main)(ARGS)
                 # add supplies relation from work package to component
 
                 push!(operations, add_assertion(child_wpd_iri, child_wp_iri, SUPPLIES, child_comp_iri))
+
+                # create interfaces
+
+                for i in ("in", "out")
+                    if_name = "IF.$(comp)_$i"
+                    push!(operations, create_instance(child_cd_iri, if_name))
+                    if_iri = instance_iri(child_cd_ns, if_name)
+                    push!(operations, add_assertion(child_cd_iri, if_iri, RDF_TYPE, INTERFACE))
+                    push!(operations, add_assertion(child_cd_iri, if_iri, HAS_COMPONENT_IDENTIFIER, if_name))
+                    push!(operations, add_assertion(child_cd_iri, child_comp_iri, PRESENTS, if_iri))
+                end
 
                 # create items description
 
