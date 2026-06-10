@@ -303,19 +303,12 @@ function (@main)(ARGS)
             (wbsd_iri, wbsd_ns) = description_iri_ns(args["namespace-base"], "$authority/WBS", args["separator"])
             wbsd_prefix = authority * "_WBS"
 
-            # description for quantities
-
-            # (qd_iri, qd_ns) = description_iri_ns(args["namespace-base"], "$authority/Q", args["separator"])
-            # qd_prefix = authority * "_Q"
-
             # create descriptions
 
             push!(operations, add_description(sbsd_ns, sbsd_prefix, args["path-base"]))
             push!(deferred, add_import(db_ns, sbsd_ns))
             push!(operations, add_description(wbsd_ns, wbsd_prefix, args["path-base"]))
             push!(deferred, add_import(db_ns, wbsd_ns))
-            # push!(operations, add_description(qd_ns, qd_prefix, args["path-base"]))
-            # push!(deferred, add_import(db_ns, qd_ns))
 
             if is_supplier
 
@@ -380,6 +373,19 @@ function (@main)(ARGS)
 
                 push!(operations, add_assertion(child_wpd_iri, child_wp_iri, SUPPLIES, child_comp_iri))
 
+                # create items description
+
+                (child_itd_iri, child_itd_ns) = description_iri_ns(args["namespace-base"], "$authority/IT/IT.$comp", args["separator"])
+                child_itd_prefix = "IT.$comp"
+
+                push!(operations, add_description(child_itd_ns, child_itd_prefix, args["path-base"]))
+                push!(operations, add_authorization(child_itd_iri, authorizing_iri))
+                push!(deferred, add_import(db_ns, child_itd_ns))
+
+                # add rights for items description
+                
+                push!(operations, add_rights(child_itd_iri, child_wp_iri))
+
                 # create mass property quantities
 
                 for (quantity, kind) in quantity_map
@@ -391,10 +397,6 @@ function (@main)(ARGS)
                     push!(operations, add_assertion(child_cd_iri, q_iri, RDF_TYPE, "http://studioj.us/metrology#$kind"))
                     push!(operations, add_assertion(child_cd_iri, q_iri, CHARACTERIZES, child_comp_iri))
                 end
-
-                # add rights for authorized work package
-                
-                # push!(operations, add_rights(qd_iri, child_wp_iri))
 
                 # create quantity value description for child workpackage
 
