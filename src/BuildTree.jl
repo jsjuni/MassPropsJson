@@ -165,6 +165,7 @@ module Main
                 d["supplies"] = comp_from_wp(wp)
             end
             children = outneighbor_labels(g, wp)
+            d["isAuthorizedBy"] = authorizer(g, wp)
             d["authorizes"] = reduce(
                 merge,
                 map(
@@ -181,9 +182,27 @@ module Main
                     ),
                 init = OrderedDict()
             )
-            if wp == project
-                d["hasName"][project] = assigned_name[project]
-            end
+            d["items"] = if wp == project
+                    d["hasName"][project] = assigned_name[project]
+                    comp = comp_from_wp(collect(children)[1])
+                    OrderedDict(comp => OrderedDict("in" => "IT.$(comp)_in", "out" => "IT.$(comp)_out"))
+                else
+                    id = OrderedDict{String, OrderedDict{String, String}}()
+                    if !isempty(children)
+                        cc = map(w -> comp_from_wp(w), children)
+                        first_comp = first(cc)
+                        last_comp = last(cc)
+                        id[first_comp] = OrderedDict("in" => wpd[d["isAuthorizedBy"]]["items"][d["supplies"]]["in"])
+                        while length(cc) > 1
+                            l = popfirst!(cc)
+                            r = first(cc)
+                            id[l]["out"] = "IT.$(l)_out"
+                            id[r] = OrderedDict("in" => "IT.$(l)_out")
+                        end
+                        id[last_comp]["out"] = wpd[d["isAuthorizedBy"]]["items"][d["supplies"]]["out"]
+                    end
+                    id
+                end
             d["hasSortKey"] = reduce(
                 merge, 
                 map(
@@ -198,7 +217,6 @@ module Main
                 ),
                 init = OrderedDict()
             )
-            d["isAuthorizedBy"] = authorizer(g, wp)
             d["hasPOIconv"] = "-"
             d["isPointMass"] = false
             if isempty(d["authorizes"])
