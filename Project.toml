@@ -2,5 +2,6 @@ name = "MassPropsJson"
 
 [deps]
 ArgParse = "c7e460c6-2fb9-53a9-8c5b-16f535851c63"
+DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
 HTTP = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
