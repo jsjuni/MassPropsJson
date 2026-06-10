@@ -11,6 +11,7 @@ module Main
     using Printf
     using CSV
     using DataFrames
+    using Base.Iterators
 
     LEVELS = [ "System", "Segment", "Element", "Subsystem", "Assembly", "Subassembly", "Part" ]
 
@@ -182,7 +183,7 @@ module Main
                     ),
                 init = OrderedDict()
             )
-            d["items"] = if wp == project
+            d["transfers"] = if wp == project
                     d["hasName"][project] = assigned_name[project]
                     comp = comp_from_wp(collect(children)[1])
                     OrderedDict(comp => OrderedDict("in" => "IT.$(comp)_in", "out" => "IT.$(comp)_out"))
@@ -192,17 +193,23 @@ module Main
                         cc = map(w -> comp_from_wp(w), children)
                         first_comp = first(cc)
                         last_comp = last(cc)
-                        id[first_comp] = OrderedDict("in" => wpd[d["isAuthorizedBy"]]["items"][d["supplies"]]["in"])
+                        id[first_comp] = OrderedDict("in" => wpd[d["isAuthorizedBy"]]["transfers"][d["supplies"]]["in"])
                         while length(cc) > 1
                             l = popfirst!(cc)
                             r = first(cc)
                             id[l]["out"] = "IT.$(l)_out"
                             id[r] = OrderedDict("in" => "IT.$(l)_out")
                         end
-                        id[last_comp]["out"] = wpd[d["isAuthorizedBy"]]["items"][d["supplies"]]["out"]
+                        id[last_comp]["out"] = wpd[d["isAuthorizedBy"]]["transfers"][d["supplies"]]["out"]
                     end
                     id
                 end
+            my_items = collect(Base.Iterators.flatten(map(d -> collect(values(d)), values(d["transfers"]))))
+            d["items"] = if wp == project
+                my_items
+            else
+                setdiff(my_items, wpd[d["isAuthorizedBy"]]["items"])
+            end
             d["hasSortKey"] = reduce(
                 merge, 
                 map(
