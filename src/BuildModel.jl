@@ -31,6 +31,8 @@ const KG_UNIT = "<http://studioj.us/units#kg>"
 const MM_UNIT = "<http://studioj.us/units#mm>"
 const KG_MM_2_UNIT = "<http://studioj.us/units#kg_mm_2>"
 const HAS_SORT_KEY = "<http://imce.jpl.nasa.gov/foundation/base#hasSortKey>"
+const TRANSFERS_IN = "http://imce.jpl.nasa.gov/foundation/mission#transfersIn"
+const TRANSFERS_OUT = "http://imce.jpl.nasa.gov/foundation/mission#transfersOut"
 
 function parse_commandline()
     s = ArgParseSettings()
@@ -324,7 +326,6 @@ function (@main)(ARGS)
 
             push!(operations, create_instance_ref(wbsd_iri, authorizing_iri))
 
-
             # create items descriptions
 
             for item in authority_data["items"]
@@ -403,7 +404,16 @@ function (@main)(ARGS)
                     push!(operations, add_assertion(child_cd_iri, if_iri, RDF_TYPE, INTERFACE))
                     push!(operations, add_assertion(child_cd_iri, if_iri, HAS_COMPONENT_IDENTIFIER, if_name))
                     push!(operations, add_assertion(child_cd_iri, child_comp_iri, PRESENTS, if_iri))
-                end
+                    item = authority_data["transfers"][comp][i]
+                    transfers = i == "in" ? TRANSFERS_IN : TRANSFERS_OUT
+                    it_name = item in authority_data["items"] ? "$authority/IT/$item" : "$authorizer/IT/$item"
+                    (child_itd_iri, child_itd_ns) = description_iri_ns(args["namespace-base"], it_name, args["separator"])
+                    item_iri = instance_iri(child_itd_ns, item)
+                    push!(operations, add_assertion(child_cd_iri, if_iri, transfers, item_iri))
+                    if item in authority_data["items"]
+                        push!(operations, add_rights(child_itd_iri, child_wp_iri))
+                    end
+                 end
 
                 # create mass property quantities
 
