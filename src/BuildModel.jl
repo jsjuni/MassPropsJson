@@ -18,6 +18,7 @@ const PROJECT = "http://imce.jpl.nasa.gov/foundation/project#Project"
 const COMPONENT = "http://imce.jpl.nasa.gov/foundation/mission#Component"
 const ITEM = "http://imce.jpl.nasa.gov/foundation/mission#Item"
 const INTERFACE = "http://imce.jpl.nasa.gov/foundation/mission#Interface"
+const JUNCTION = "http://imce.jpl.nasa.gov/foundation/mission#Junction"
 const SUPPLIES = "http://imce.jpl.nasa.gov/foundation/project#supplies"
 const HAS_NUMBER = "<http://studioj.us/metrology#hasNumber>"
 const HAS_UNIT = "<http://studioj.us/metrology#hasUnit>"
@@ -33,6 +34,9 @@ const KG_MM_2_UNIT = "<http://studioj.us/units#kg_mm_2>"
 const HAS_SORT_KEY = "<http://imce.jpl.nasa.gov/foundation/base#hasSortKey>"
 const TRANSFERS_IN = "http://imce.jpl.nasa.gov/foundation/mission#transfersIn"
 const TRANSFERS_OUT = "http://imce.jpl.nasa.gov/foundation/mission#transfersOut"
+const HAS_IDENTIFIER = "http://imce.jpl.nasa.gov/foundation/base#hasIdentifier"
+const JOINS1 = "http://imce.jpl.nasa.gov/foundation/mission#joins1"
+const JOINS2 = "http://imce.jpl.nasa.gov/foundation/mission#joins2"
 
 function parse_commandline()
     s = ArgParseSettings()
@@ -298,15 +302,20 @@ function (@main)(ARGS)
 
         if length(authority_data["authorizes"]) > 0
 
-            # description for components
+            # description for system breakdown structure
 
             (sbsd_iri, sbsd_ns) = description_iri_ns(args["namespace-base"], "$authority/SBS", args["separator"])
             sbsd_prefix = authority * "_SBS"
 
-            # description for work packages
+            # description for work breakdown structure
 
             (wbsd_iri, wbsd_ns) = description_iri_ns(args["namespace-base"], "$authority/WBS", args["separator"])
             wbsd_prefix = authority * "_WBS"
+
+            # description for system interconnect structure
+
+            (sisd_iri, sisd_ns) = description_iri_ns(args["namespace-base"], "$authority/SIS", args["separator"])
+            sisd_prefix = authority * "_SIS"
 
             # create descriptions
 
@@ -314,7 +323,15 @@ function (@main)(ARGS)
             push!(deferred, add_import(db_ns, sbsd_ns))
             push!(operations, add_description(wbsd_ns, wbsd_prefix, args["path-base"]))
             push!(deferred, add_import(db_ns, wbsd_ns))
+            push!(operations, add_description(sisd_ns, sisd_prefix, args["path-base"]))
+            push!(deferred, add_import(db_ns, sisd_ns))
 
+           # add authorization annotations to descriptions
+
+            push!(operations, add_authorization(sbsd_iri, authorizing_iri))
+            push!(operations, add_authorization(wbsd_iri, authorizing_iri))
+            push!(operations, add_authorization(sisd_iri, authorizing_iri))
+            
             if is_supplier
 
                 # create ref for "contains" assertions
@@ -343,6 +360,8 @@ function (@main)(ARGS)
                 push!(operations, add_assertion(child_itd_iri, item_iri, RDF_TYPE, ITEM))
             end
             
+            if_data = Dict{String, String}()
+
             for (wp, comp) in authority_data["authorizes"]
 
                 # create work package description
@@ -413,6 +432,7 @@ function (@main)(ARGS)
                     if item in authority_data["items"]
                         push!(operations, add_rights(child_itd_iri, child_wp_iri))
                     end
+                    if_data[if_name] = if_iri
                  end
 
                 # create mass property quantities
@@ -438,12 +458,21 @@ function (@main)(ARGS)
 
             end
 
-            # add authorization annotations to descriptions
+            # add junctions to system interconnection structure
 
-            push!(operations, add_authorization(sbsd_iri, authorizing_iri))
-            push!(operations, add_authorization(wbsd_iri, authorizing_iri))
-           
-        end
+            for (j_name, jh) in authority_data["junctions"]
+                push!(operations, create_instance(sisd_iri, j_name))
+                j_iri = instance_iri(sisd_ns, j_name)
+                push!(operations, add_assertion(sisd_iri, j_iri, HAS_IDENTIFIER, j_name))
+                push!(operations, add_assertion(sisd_iri, j_iri, RDF_TYPE, JUNCTION))
+                for (n, if_name) in jh
+                    if_iri = if_data[if_name]
+                    joins = Dict("1" => JOINS1, "2" => JOINS2)[string(n)]
+                    push!(operations, add_assertion(sisd_iri, j_iri, joins, if_iri))
+                end
+             end
+
+         end
 
         if is_supplier
 
