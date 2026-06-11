@@ -204,6 +204,19 @@ module Main
                     end
                     id
                 end
+            d["junctions"] = begin
+                jd = OrderedDict{String, OrderedDict{String, String}}()
+                cc = collect(keys(d["transfers"]))
+                jc = 0
+                while length(cc) > 1
+                    l = popfirst!(cc)
+                    r = first(cc)
+                    j_name = "J.IF.$(l)_out.IF.$(r)_in"
+                    jd[j_name] = OrderedDict{String, String}("1" => "IF.$(l)_out", "2" => "IF.$(r)_in")
+                    jd
+\                end
+                jd
+            end
             my_items = collect(Base.Iterators.flatten(map(d -> collect(values(d)), values(d["transfers"]))))
             d["items"] = if wp == project
                 my_items
