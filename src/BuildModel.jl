@@ -34,6 +34,7 @@ const KG_MM_2_UNIT = "<http://studioj.us/units#kg_mm_2>"
 const HAS_SORT_KEY = "<http://imce.jpl.nasa.gov/foundation/base#hasSortKey>"
 const TRANSFERS_IN = "http://imce.jpl.nasa.gov/foundation/mission#transfersIn"
 const TRANSFERS_OUT = "http://imce.jpl.nasa.gov/foundation/mission#transfersOut"
+const TRAVERSES = "http://imce.jpl.nasa.gov/foundation/mission#traverses"
 const HAS_IDENTIFIER = "http://imce.jpl.nasa.gov/foundation/base#hasIdentifier"
 const JOINS1 = "http://imce.jpl.nasa.gov/foundation/mission#joins1"
 const JOINS2 = "http://imce.jpl.nasa.gov/foundation/mission#joins2"
@@ -360,7 +361,7 @@ function (@main)(ARGS)
                 push!(operations, add_assertion(child_itd_iri, item_iri, RDF_TYPE, ITEM))
             end
             
-            if_data = Dict{String, String}()
+            iri_from_name = Dict{String, String}()
 
             for (wp, comp) in authority_data["authorizes"]
 
@@ -432,7 +433,8 @@ function (@main)(ARGS)
                     if item in authority_data["items"]
                         push!(operations, add_rights(child_itd_iri, child_wp_iri))
                     end
-                    if_data[if_name] = if_iri
+                    iri_from_name[if_name] = if_iri
+                    iri_from_name[item] = item_iri
                  end
 
                 # create mass property quantities
@@ -466,11 +468,15 @@ function (@main)(ARGS)
                 push!(operations, add_assertion(sisd_iri, j_iri, HAS_IDENTIFIER, j_name))
                 push!(operations, add_assertion(sisd_iri, j_iri, RDF_TYPE, JUNCTION))
                 for (n, if_name) in jh
-                    if_iri = if_data[if_name]
+                    if_iri = iri_from_name[if_name]
                     joins = Dict("1" => JOINS1, "2" => JOINS2)[string(n)]
                     push!(operations, add_assertion(sisd_iri, j_iri, joins, if_iri))
                 end
-             end
+                it_name = replace(jh["1"], r"^IF" => "IT")
+                it_iri = iri_from_name[it_name]
+                push!(operations, create_instance_ref(sisd_ns, it_iri))
+                push!(operations, add_assertion(sisd_iri, it_iri, TRAVERSES, j_iri))
+              end
 
          end
 
