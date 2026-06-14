@@ -297,6 +297,7 @@ function (@main)(ARGS)
             push!(operations, add_assertion(authorizing_d_iri, authorizing_iri, HAS_PROJECT_IDENTIFIER, authority))
             push!(operations, add_assertion(authorizing_d_iri, authorizing_iri, HAS_CANONICAL_NAME, authority_data["hasName"][authority]))
             push!(operations, add_assertion(authorizing_d_iri, authorizing_iri, HAS_SORT_KEY, "00"))
+            push!(operations, add_authorization(authorizing_d_iri, authorizing_iri))
             push!(deferred, add_import(db_ns, authorizing_d_ns))
             
         end
