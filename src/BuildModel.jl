@@ -39,36 +39,46 @@ const HAS_IDENTIFIER = "http://imce.jpl.nasa.gov/foundation/base#hasIdentifier"
 const JOINS1 = "http://imce.jpl.nasa.gov/foundation/mission#joins1"
 const JOINS2 = "http://imce.jpl.nasa.gov/foundation/mission#joins2"
 
+const MULTI_LEVEL = Dict(
+    "C.1.2.2" => Dict(
+        "C.1.2.2.A" => ["C.1.2.2.1", "C.1.2.2.2"],
+        "C.1.2.2.B" => ["C.1.2.2.3", "C.1.2.2.4", "C.1.2.2.5"]
+    )
+)
+
 function parse_commandline()
     s = ArgParseSettings()
     @add_arg_table s begin
         "--input"
-        help = "Input file (JSON)"
-        arg_type = String
-        required = true
+            help = "Input file (JSON)"
+            arg_type = String
+            required = true
         "--limit"
-        help = "Limit number of components to process (default: no limit)"
-        arg_type = Int64
-        default = 0
+            help = "Limit number of components to process (default: no limit)"
+            arg_type = Int64
+            default = 0
         "--server"
-        help = "Column name for server URL (default: http://127.0.0.1:8080)"
-        arg_type = String
-        default = "http://127.0.0.1:8080"
+            help = "Column name for server URL (default: http://127.0.0.1:8080)"
+            arg_type = String
+            default = "http://127.0.0.1:8080"
         "--path-base"
-        help = "OML source path base (default: src/oml/model)"
-        arg_type = String
-        default = "src/model/oml"
+            help = "OML source path base (default: src/oml/model)"
+            arg_type = String
+            default = "src/model/oml"
         "--namespace-base"
-        help = "Base namespace for OML (default: http://studioj.us/mass-props-oml)"
-        arg_type = String
-        default = "http://studioj.us/mass-props-oml"
+            help = "Base namespace for OML (default: http://studioj.us/mass-props-oml)"
+            arg_type = String
+            default = "http://studioj.us/mass-props-oml"
         "--separator"
-        help = "Namespace separator (default: #)"
-        arg_type = String
-        default = "#"
+            help = "Namespace separator (default: #)"
+            arg_type = String
+            default = "#"
         "--defer-diagnostics"
-        help = "Defer diagnostics until the end (default: false)"
-        action = :store_true
+            help = "Defer diagnostics until the end (default: false)"
+            action = :store_true
+        "--multi-level"
+            help = "Multi-level SBS"
+            action = :store_true
     end
     return parse_args(s)
 end
@@ -246,6 +256,16 @@ function (@main)(ARGS)
 
     deferred = []
 
+    multi_level_parent = Dict()
+    for (s, sh) in MULTI_LEVEL
+        multi_level_parent[s] = d = Dict()
+        for (p, cl) in sh
+            for c in cl
+                d[c] = p
+            end
+        end
+    end
+
     # create description bundle
 
     (db_iri, db_ns) = description_iri_ns(args["namespace-base"], "bundle", args["separator"])
@@ -275,8 +295,9 @@ function (@main)(ARGS)
 
             # supplied component details
 
-            (supplied_comp_d_iri, supplied_comp_d_ns) = description_iri_ns(args["namespace-base"], "$authorizer/C/" * authority_data["supplies"], args["separator"])
-            supplied_comp_iri = instance_iri(supplied_comp_d_ns, authority_data["supplies"])
+            supplied_comp = authority_data["supplies"]
+            (supplied_comp_d_iri, supplied_comp_d_ns) = description_iri_ns(args["namespace-base"], "$authorizer/C/" * supplied_comp, args["separator"])
+            supplied_comp_iri = instance_iri(supplied_comp_d_ns, supplied_comp)
 
             (supplied_comp_qd_iri, supplied_comp_qd_ns) = description_iri_ns(args["namespace-base"], "$authorizer/Q", args["separator"])
 
@@ -339,6 +360,21 @@ function (@main)(ARGS)
                 # create ref for "contains" assertions
 
                 push!(operations, create_instance_ref(sbsd_iri, supplied_comp_iri))
+
+                # apply multi-level elaboration if requested
+
+                if args["multi-level"] && haskey(MULTI_LEVEL, supplied_comp)
+                    for sub in ["A", "B"]
+                        sub_comp = "$supplied_comp.$sub"
+                        push!(operations, create_instance(sbsd_iri, sub_comp))
+                        sub_comp_iri = instance_iri(sbsd_ns, sub_comp)
+                        push!(operations, add_assertion(sbsd_iri, sub_comp_iri, RDF_TYPE, COMPONENT))
+                        push!(operations, add_assertion(sbsd_iri, sub_comp_iri, HAS_COMPONENT_IDENTIFIER, sub_comp))
+                        push!(operations, add_assertion(sbsd_iri, sub_comp_iri, HAS_CANONICAL_NAME, sub_comp))
+                        push!(operations, add_assertion(sbsd_iri, supplied_comp_iri, CONTAINS, sub_comp_iri))
+                    end
+                end
+        
             end
 
             # create ref for "authorizes" assertions
@@ -405,7 +441,13 @@ function (@main)(ARGS)
                 push!(operations, add_assertion(child_cd_iri, child_comp_iri, HAS_COMPONENT_IDENTIFIER, comp))
                 push!(operations, add_assertion(child_cd_iri, child_comp_iri, HAS_SORT_KEY, authority_data["hasSortKey"][comp]))
                 if (is_supplier)
-                    push!(operations, add_assertion(sbsd_iri, supplied_comp_iri, CONTAINS, child_comp_iri))
+                    if args["multi-level"] && haskey(MULTI_LEVEL, supplied_comp)
+                        parent_comp = multi_level_parent[supplied_comp][comp]
+                        parent_comp_iri = instance_iri(sbsd_ns, parent_comp)
+                    else
+                        parent_comp_iri = supplied_comp_iri
+                    end
+                    push!(operations, add_assertion(sbsd_iri, parent_comp_iri, CONTAINS, child_comp_iri))
                 end
 
                 # add rights for authorized work package
@@ -477,7 +519,7 @@ function (@main)(ARGS)
                 it_iri = iri_from_name[it_name]
                 push!(operations, create_instance_ref(sisd_ns, it_iri))
                 push!(operations, add_assertion(sisd_iri, it_iri, TRAVERSES, j_iri))
-              end
+            end
 
          end
 
@@ -486,7 +528,7 @@ function (@main)(ARGS)
             # add quantity values
 
             for (quantity, kind) in quantity_map
-                q_name = authority_data["supplies"] * "_" * quantity
+                q_name = supplied_comp * "_" * quantity
                 qv_name = q_name * "_value"
                 q_iri = instance_iri(supplied_comp_d_ns, q_name)
                 qv_iri = instance_iri(supplied_comp_qvd_ns, qv_name)
