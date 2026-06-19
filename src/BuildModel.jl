@@ -417,7 +417,7 @@ function (@main)(ARGS)
                 push!(operations, add_assertion(child_wpd_iri, child_wp_iri, RDF_TYPE, WORK_PACKAGE))
                 push!(operations, add_assertion(child_wpd_iri, child_wp_iri, HAS_CANONICAL_NAME, authority_data["hasName"][comp]))
                 push!(operations, add_assertion(child_wpd_iri, child_wp_iri, HAS_WORK_PACKAGE_IDENTIFIER, wp))
-                push!(operations, add_assertion(child_wpd_iri, child_wp_iri, HAS_SORT_KEY, authority_data["hasSortKey"][comp]))
+                push!(operations, add_assertion(child_wpd_iri, child_wp_iri, HAS_SORT_KEY, authority_data["hasSortKey"][wp]))
                 push!(operations, add_assertion(wbsd_iri, authorizing_iri, AUTHORIZES, child_wp_iri))
 
                 # add rights for authorized work package

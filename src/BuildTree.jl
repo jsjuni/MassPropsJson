@@ -231,6 +231,11 @@ module Main
                             map(
                                 x -> @sprintf("%02d", parse(Int, x)), split(comp_from_wp(p), ".")[2:end]
                             )
+                        ),
+                        p => join(
+                            map(
+                               x -> @sprintf("%02d", parse(Int, x)), split(p, ".")[2:end] 
+                            )
                         )
                     ),
                     children
