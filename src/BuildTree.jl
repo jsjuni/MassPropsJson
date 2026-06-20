@@ -242,8 +242,10 @@ module Main
                 ),
                 init = OrderedDict()
             )
-            d["hasPOIconv"] = "-"
-            d["isPointMass"] = false
+            if haskey(d, "supplies")
+                d["hasPOIconv"] = "-"
+                d["isPointMass"] = false
+            end
             if isempty(d["authorizes"])
                 d["hasValues"] = sample_props(table)
             end
