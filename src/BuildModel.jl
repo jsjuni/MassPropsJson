@@ -25,6 +25,9 @@ const HAS_UNIT = "<http://studioj.us/metrology#hasUnit>"
 const HAS_POI_CONVENTION = "<http://studioj.us/metrology#hasPoiConvention>"
 const IS_POINT_MASS = "<http://studioj.us/metrology#isPointMass>"
 const HAS_COMPONENT_IDENTIFIER = "<http://studioj.us/base#hasComponentIdentifier>"
+const HAS_INTERFACE_IDENTIFIER = "<http://studioj.us/base#hasInterfaceIdentifier>"
+const HAS_JUNCTION_IDENTIFIER = "<http://studioj.us/base#hasJunctionIdentifier>"
+const HAS_ITEM_IDENTIFIER = "<http://studioj.us/base#hasItemIdentifier>"
 const HAS_WORK_PACKAGE_IDENTIFIER = "<http://studioj.us/base#hasWorkPackageIdentifier>"
 const HAS_PROJECT_IDENTIFIER = "<http://studioj.us/base#hasProjectIdentifier>"
 const HAS_QUANTITY_IDENTIFIER = "<http://studioj.us/metrology#hasQuantityIdentifier>"
@@ -38,6 +41,7 @@ const TRAVERSES = "http://imce.jpl.nasa.gov/foundation/mission#traverses"
 const HAS_IDENTIFIER = "http://imce.jpl.nasa.gov/foundation/base#hasIdentifier"
 const JOINS1 = "http://imce.jpl.nasa.gov/foundation/mission#joins1"
 const JOINS2 = "http://imce.jpl.nasa.gov/foundation/mission#joins2"
+const STUDIOJ_BUNDLE = "http://studioj.us/bundle#"
 
 const MULTI_LEVEL = Dict(
     "C.1.2.2" => Dict(
@@ -272,6 +276,7 @@ function (@main)(ARGS)
     db_prefix = "description-bundle"
 
     push!(deferred, add_description_bundle(db_ns, db_prefix, args["path-base"]))
+    push!(deferred, add_import(db_ns, STUDIOJ_BUNDLE))
 
     for (i, v) in enumerate(vl)
         if args["limit"] > 0 && i > args["limit"]
@@ -396,6 +401,7 @@ function (@main)(ARGS)
                 item_iri = instance_iri(child_itd_ns, item)
                 push!(operations, create_instance(child_itd_iri, item))
                 push!(operations, add_assertion(child_itd_iri, item_iri, RDF_TYPE, ITEM))
+                push!(operations, add_assertion(child_itd_iri, item_iri, HAS_ITEM_IDENTIFIER, item))
             end
             
             iri_from_name = Dict{String, String}()
@@ -465,7 +471,7 @@ function (@main)(ARGS)
                     push!(operations, create_instance(child_cd_iri, if_name))
                     if_iri = instance_iri(child_cd_ns, if_name)
                     push!(operations, add_assertion(child_cd_iri, if_iri, RDF_TYPE, INTERFACE))
-                    push!(operations, add_assertion(child_cd_iri, if_iri, HAS_COMPONENT_IDENTIFIER, if_name))
+                    push!(operations, add_assertion(child_cd_iri, if_iri, HAS_INTERFACE_IDENTIFIER, if_name))
                     push!(operations, add_assertion(child_cd_iri, child_comp_iri, PRESENTS, if_iri))
                     item = authority_data["transfers"][comp][i]
                     transfers = i == "in" ? TRANSFERS_IN : TRANSFERS_OUT
@@ -508,7 +514,7 @@ function (@main)(ARGS)
             for (j_name, jh) in authority_data["junctions"]
                 push!(operations, create_instance(sisd_iri, j_name))
                 j_iri = instance_iri(sisd_ns, j_name)
-                push!(operations, add_assertion(sisd_iri, j_iri, HAS_IDENTIFIER, j_name))
+                push!(operations, add_assertion(sisd_iri, j_iri, HAS_JUNCTION_IDENTIFIER, j_name))
                 push!(operations, add_assertion(sisd_iri, j_iri, RDF_TYPE, JUNCTION))
                 for (n, if_name) in jh
                     if_iri = iri_from_name[if_name]
