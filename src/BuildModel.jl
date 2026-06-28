@@ -304,8 +304,6 @@ function (@main)(ARGS)
             (supplied_comp_d_iri, supplied_comp_d_ns) = description_iri_ns(args["namespace-base"], "$authorizer/C/" * supplied_comp, args["separator"])
             supplied_comp_iri = instance_iri(supplied_comp_d_ns, supplied_comp)
 
-            (supplied_comp_qd_iri, supplied_comp_qd_ns) = description_iri_ns(args["namespace-base"], "$authorizer/Q", args["separator"])
-
             (supplied_comp_qvd_iri, supplied_comp_qvd_ns) = description_iri_ns(args["namespace-base"], "$authority/QV", args["separator"])
 
         else
