@@ -9,6 +9,13 @@ module Main
     using DataFrames
     using DataStructures
     using MassProps
+    using CSV
+
+    const HAS_NUMBER = "<http://studioj.us/metrology#hasNumber>"
+    const HAS_UNIT = "<http://studioj.us/metrology#hasUnit>"
+    const KG_UNIT = "<http://studioj.us/units#kg>"
+    const MM_UNIT = "<http://studioj.us/units#mm>"
+    const KG_MM_2_UNIT = "<http://studioj.us/units#kg_mm_2>"
 
     const MASS_PROPS = [
         "mass",
@@ -231,6 +238,53 @@ module Main
         }
     """
 
+    const DESC_QUERY = """
+        PREFIX dc: <http://purl.org/dc/elements/1.1/>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX oml: <http://opencaesar.io/oml#>
+        PREFIX base: <http://imce.jpl.nasa.gov/foundation/base#>
+        PREFIX analysis: <http://imce.jpl.nasa.gov/foundation/analysis#>
+        PREFIX mission: <http://imce.jpl.nasa.gov/foundation/mission#>
+        PREFIX project: <http://imce.jpl.nasa.gov/foundation/project#>
+        PREFIX metrology: <http://studioj.us/metrology#>
+        SELECT ?id ?g
+
+        WHERE {
+
+            ?component a mission:Component ;
+                base:hasIdentifier ?id .
+
+            GRAPH ?g {
+                ?mv analysis:characterizes ?mq ;
+                    rdfs:label "mass" .
+            }
+            ?mq analysis:characterizes ?component .
+        }
+    """
+
+    unit_map = Dict(
+        "mass" => KG_UNIT,
+        "Cx" => MM_UNIT,
+        "Cy" => MM_UNIT,
+        "Cz" => MM_UNIT,
+        "Ixx" => KG_MM_2_UNIT,
+        "Iyy" => KG_MM_2_UNIT,
+        "Izz" => KG_MM_2_UNIT,
+        "Ixy" => KG_MM_2_UNIT,
+        "Ixz" => KG_MM_2_UNIT,
+        "Iyz" => KG_MM_2_UNIT,
+        "sigma_mass" => KG_UNIT,
+        "sigma_Cx" => MM_UNIT,
+        "sigma_Cy" => MM_UNIT,
+        "sigma_Cz" => MM_UNIT,
+        "sigma_Ixx" => KG_MM_2_UNIT,
+        "sigma_Iyy" => KG_MM_2_UNIT,
+        "sigma_Izz" => KG_MM_2_UNIT,
+        "sigma_Ixy" => KG_MM_2_UNIT,
+        "sigma_Ixz" => KG_MM_2_UNIT,
+        "sigma_Iyz" => KG_MM_2_UNIT
+    )
+
     function parse_commandline()
         s = ArgParseSettings()
         @add_arg_table s begin
@@ -238,10 +292,6 @@ module Main
             help = "Column name for server URL (default: http://127.0.0.1:8080)"
             arg_type = String
             default = "http://127.0.0.1:8080"
-        "--path-base"
-            help = "OML source path base (default: src/oml/model)"
-            arg_type = String
-            default = "src/model/oml"
         "--model-id"
             help = "Model ID for query (default: studioj.us/mass-props-oml/bundle)"
             arg_type = String
@@ -250,6 +300,10 @@ module Main
             help = "Namespace separator (default: #)"
             arg_type = String
             default = "#"
+        "--output"
+            help = "Output file name (default: /tmp/rollup-mass-props.csv)"
+            arg_type = String
+            default = "/tmp/rollup-mass-props.csv"
         end
         return parse_args(s)
     end
@@ -278,6 +332,17 @@ module Main
         return resp.status == 200
     end
 
+    function add_assertion(description_iri, subject_iri, predicate_iri, object_iri)
+        Dict(
+            "addAssertion" => Dict(
+                "descriptionIri" => description_iri,
+                "subjectIri" => subject_iri,
+                "predicateIri" => predicate_iri,
+                "object" => object_iri
+            )
+        )
+    end
+
     function (@main)(ARGS)
         
         @info "begin RollupMassProps"
@@ -285,6 +350,8 @@ module Main
     
         server = args["server"]
         model_id = args["model-id"]
+        separator = args["separator"]
+        output = args["output"]
 
         if !is_alive(server)
             @error "server is not alive: $server"
@@ -306,13 +373,12 @@ module Main
             add_vertex!(graph, edge[2])
             add_edge!(graph, edge[1], edge[2])
         end
-        @info "Graph constructed with $(nv(graph)) vertices and $(ne(graph)) edges"
+        @info " constructed with $(nv(graph)) vertices and $(ne(graph)) edges"
 
         # Build data frame.
 
         for vertex in map(v -> label_for(graph, v), vertices(graph))
-            @info "Processing vertex: $(vertex)"
-            mp_vals_dict = OrderedDict{String, Union{Float64, Nothing}}()
+           mp_vals_dict = OrderedDict{String, Union{Float64, Nothing}}()
             for name in MASS_PROPS
                 mp_vals_dict[name] = nothing
             end
@@ -326,6 +392,7 @@ module Main
                 )
             )
         end
+        @info "DataFrame constructed with $(nrow(table)) rows and $(ncol(table)) columns"
         
         # Populate leaf vertices with mass properties.
 
@@ -339,15 +406,44 @@ module Main
                 end
             end
         end
-        @info "table $table"
+        @info "Leaf vertices populated with mass properties"
 
         # Roll up mass properties.
 
         mp_table = rollup_mass_props_and_unc(graph, table)
-        @info "Rollup results: $mp_table"
+        @info "Mass properties rolled up to parent vertices"
+
+        # Save rolled up mass properties to CSV.
+        f = args["output"] == "" ? stdout : open(args["output"], "w")
+        CSV.write(f, mp_table)
+        close(f)
+
+        # Look up QV description for each component.
+
+        desc_query_result = run_query(server, model_id, DESC_QUERY)
+        desc_query_result_json = JSON3.read(String(desc_query_result.body))
+        desc_map = Dict(x["id"]["value"] => x["g"]["value"] for x in desc_query_result_json["results"]["bindings"])
+        for (id, desc) in desc_map
+            if (inneighbors(graph, code_for(graph, id)) |> collect |> length) > 0
+                operations = []
+                @info "update values for $id"
+                desc_iri = "$desc#"
+                for prop in MASS_PROPS
+                    if !ismissing(table[table.id .== id, prop][1])
+                        subject_iri = "$desc$separator$(id)_$(prop)_value"
+                        number = mp_table[mp_table.id .== id, prop][1]
+                        unit = unit_map[prop]
+                        push!(operations, add_assertion(desc_iri, subject_iri, HAS_NUMBER, Dict("\$type" => "DoubleLiteral", "value" => number)))
+                        push!(operations, add_assertion(desc, subject_iri, HAS_UNIT, unit))
+                    end
+                end
+                update(server, operations, true)
+            end
+       end
 
         @info "end RollupMassProps"
         exit(0)
-    end
+ 
 
+   end
 end # module
