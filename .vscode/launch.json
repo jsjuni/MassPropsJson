@@ -7,6 +7,14 @@
         {
             "type": "julia",
             "request": "launch",
+            "name": "BuildRequirements",
+            "program": "${workspaceFolder}/src/BuildRequirements.jl",
+            "stopOnEntry": false,
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "julia",
+            "request": "launch",
             "name": "RollupMassProps",
             "program": "${workspaceFolder}/src/RollupMassProps.jl",
             "stopOnEntry": false,
