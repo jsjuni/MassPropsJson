@@ -11,11 +11,14 @@ module Main
     using MassProps
     using CSV
     using Distributions
+    using Printf
 
     const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
     const REQUIREMENT = "http://imce.jpl.nasa.gov/foundation/mission#Requirement"
     const QUANTITY_VALUE_CONSTRAINT = "http://imce.jpl.nasa.gov/foundation/analysis#QuantityValueConstraint"
+    const HAS_QUANTITY_VALUE_RELATION = "http://imce.jpl.nasa.gov/foundation/analysis#hasQuantityValueRelation"
     const HAS_REQUIREMENT_IDENTIFIER = "<http://studioj.us/base#hasRequirementIdentifier>"
+    const HAS_DESCRIPTION = "http://imce.jpl.nasa.gov/foundation/base#hasDescription"
     const DC_CREATOR = "http://purl.org/dc/elements/1.1/creator"
     const ANALYZES = "http://imce.jpl.nasa.gov/foundation/analysis#analyzes"
     const EXPLAINS = "http://imce.jpl.nasa.gov/foundation/analysis#explains"
@@ -43,12 +46,13 @@ module Main
         PREFIX mission: <http://imce.jpl.nasa.gov/foundation/mission#>
         PREFIX project: <http://imce.jpl.nasa.gov/foundation/project#>
         PREFIX metrology: <http://studioj.us/metrology#>
-        SELECT ?id ?g ?creator ?rights
+        SELECT ?id ?name ?g ?creator ?rights
 
         WHERE {
 
             ?component a mission:Component ;
-                base:hasIdentifier ?id .
+                base:hasIdentifier ?id ;
+                base:hasCanonicalName ?name .
 
             GRAPH ?g {
                 ?mq analysis:characterizes ?component ;
@@ -196,14 +200,15 @@ module Main
             exit(1)
         end
 
-        desq_query_result_json = JSON3.read(String(desc_query_result.body))
+        desc_query_result_json = JSON3.read(String(desc_query_result.body))
         desc_map = Dict{String, Dict{String, String}}()
-        for row in desq_query_result_json["results"]["bindings"]
+        for row in desc_query_result_json["results"]["bindings"]
             id = row["id"]["value"]
+            name = row["name"]["value"]
             g = row["g"]["value"]
             creator = row["creator"]["value"]
             rights = row["rights"]["value"]
-            desc_map[id] = Dict("g" => g, "creator" => creator, "rights" => rights)
+            desc_map[id] = Dict("name" => name, "g" => g, "creator" => creator, "rights" => rights)
         end
         @info "desc_map has $(length(desc_map)) entries"
 
@@ -225,17 +230,19 @@ module Main
 
             mass = df[df.id .== id, "mass"][1]
             sigma_mass = df[df.id .== id, "sigma_mass"][1]
-            upper_mass = rand(Normal(mass, sigma_mass), 1)[1] + 2.0 * sigma_mass
+            upper_mass = @sprintf("%.2f", rand(Normal(mass, sigma_mass), 1)[1] + 2.0 * sigma_mass)
 
             # Create mass upper bound requirement.
 
             mr_id = "$(id)_R.1"
             mr_name = "$(id)_mass_max"
             mr_iri = "$(desc_iri)$separator$mr_name"
+            mr_desc = "The $(desc_map[id]["name"]) mass shall not exceed $upper_mass kg."
 
             push!(operations, create_instance(desc_iri, mr_name))
             push!(operations, add_assertion(desc_iri, mr_iri, RDF_TYPE, REQUIREMENT))
             push!(operations, add_assertion(desc_iri, mr_iri, HAS_REQUIREMENT_IDENTIFIER, mr_id))
+            push!(operations, add_assertion(desc_iri, mr_iri, HAS_DESCRIPTION, mr_desc))
 
             # Create mass max constraint.
 
@@ -244,6 +251,7 @@ module Main
 
             push!(operations, create_instance(desc_iri, mc_name))
             push!(operations, add_assertion(desc_iri, mc_iri, RDF_TYPE, QUANTITY_VALUE_CONSTRAINT))
+            push!(operations, add_assertion(desc_iri, mc_iri, HAS_QUANTITY_VALUE_RELATION, "le"))
             push!(operations, add_assertion(desc_iri, mr_iri, REQUIRES, mc_iri))
 
             # Assert explanation of mass quantity by constraint.
@@ -274,9 +282,18 @@ module Main
                 cr_name = "$(id)_$(c)_range"
                 cr_iri = "$(desc_iri)$separator$cr_name"
 
+                cv = df[df.id .== id, c][1]
+                sigma_cv = df[df.id .== id, "sigma_$c"][1]
+                cv_center = rand(Normal(cv, sigma_cv), 1)[1]
+                cv_lower = @sprintf("%.2f", cv_center - 2.0 * sigma_cv)
+                cv_upper = @sprintf("%.2f", cv_center + 2.0 * sigma_cv)
+                cv_desc = "The $(desc_map[id]["name"]) $c shall lie in the interval [$cv_lower, $cv_upper] mm."
+
                 push!(operations, create_instance(desc_iri, cr_name))
+
                 push!(operations, add_assertion(desc_iri, cr_iri, RDF_TYPE, REQUIREMENT))
                 push!(operations, add_assertion(desc_iri, cr_iri, HAS_REQUIREMENT_IDENTIFIER, cr_id))
+                push!(operations, add_assertion(desc_iri, cr_iri, HAS_DESCRIPTION, cv_desc))
 
                 # Create min and max constraints for each center of mass coordinate.
 
@@ -284,12 +301,14 @@ module Main
                 cc_min_iri = "$(desc_iri)$separator$cc_min_name"
                 push!(operations, create_instance(desc_iri, cc_min_name))
                 push!(operations, add_assertion(desc_iri, cc_min_iri, RDF_TYPE, QUANTITY_VALUE_CONSTRAINT))
+                push!(operations, add_assertion(desc_iri, cc_min_iri, HAS_QUANTITY_VALUE_RELATION, "ge"))
                 push!(operations, add_assertion(desc_iri, cr_iri, REQUIRES, cc_min_iri))
 
                 cc_max_name = "$(id)_$(c)_max_constraint"
                 cc_max_iri = "$(desc_iri)$separator$cc_max_name"
                 push!(operations, create_instance(desc_iri, cc_max_name))
                 push!(operations, add_assertion(desc_iri, cc_max_iri, RDF_TYPE, QUANTITY_VALUE_CONSTRAINT))
+                push!(operations, add_assertion(desc_iri, cc_max_iri, HAS_QUANTITY_VALUE_RELATION, "le"))
                 push!(operations, add_assertion(desc_iri, cr_iri, REQUIRES, cc_max_iri))
 
                 # Assert explanation of each center of mass quantity by min and max constraints.
@@ -306,15 +325,17 @@ module Main
                 cmv_min_iri = "$(desc_iri)$separator$cmv_min_name"
                 push!(operations, create_instance(desc_iri, cmv_min_name))
                 push!(operations, add_assertion(desc_iri, cmv_min_iri, RDF_TYPE, LENGTH_VALUE))
-                push!(operations, add_assertion(desc_iri, cc_min_iri, ANALYZES, cmv_min_iri))
+                push!(operations, add_assertion(desc_iri, cmv_min_iri, HAS_NUMBER, Dict("\$type" => "DoubleLiteral", "value" => cv_lower)))
                 push!(operations, add_assertion(desc_iri, cmv_min_iri, HAS_UNIT, MM_UNIT))
+                push!(operations, add_assertion(desc_iri, cc_min_iri, ANALYZES, cmv_min_iri))
 
                 cmv_max_name = "$(id)_$(c)_max_value"
                 cmv_max_iri = "$(desc_iri)$separator$cmv_max_name"
                 push!(operations, create_instance(desc_iri, cmv_max_name))
                 push!(operations, add_assertion(desc_iri, cmv_max_iri, RDF_TYPE, LENGTH_VALUE))
-                push!(operations, add_assertion(desc_iri, cc_max_iri, ANALYZES, cmv_max_iri))
+                push!(operations, add_assertion(desc_iri, cmv_max_iri, HAS_NUMBER, Dict("\$type" => "DoubleLiteral", "value" => cv_upper)))
                 push!(operations, add_assertion(desc_iri, cmv_max_iri, HAS_UNIT, MM_UNIT))
+                push!(operations, add_assertion(desc_iri, cc_max_iri, ANALYZES, cmv_max_iri))
             
             end
         
