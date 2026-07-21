@@ -32,11 +32,6 @@ module Main
     const MASS_VALUE = "<http://studioj.us/metrology#MassValue>"
     const LENGTH_VALUE = "<http://studioj.us/metrology#LengthValue>"
 
-    const MASS_PROPS = [
-        "mass",
-        "Cx", "Cy", "Cz"
-    ]
-
     const DESC_QUERY = """
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -93,6 +88,10 @@ module Main
             help = "Input file name (default: /tmp/rollup-mass-props.csv)"
             arg_type = String
             default = "/tmp/rollup-mass-props.csv"
+        "--bundle"
+            help = "Description bundle (default: http://studioj.us/mass-props-oml/bundle)"
+            arg_type = String
+            default = "http://studioj.us/mass-props-oml/bundle"
         end
         return parse_args(s)
     end
@@ -128,6 +127,15 @@ module Main
                 "ontologyNamespace" => namespace,
                 "ontologyPrefix" => prefix,
                 "targetFolder" => path
+            )
+        )
+    end
+
+    function add_import(importing, imported)
+        Dict(
+            "addImport" => Dict(
+                "importingIri" => importing,
+                "importedIri" => imported,
             )
         )
     end
@@ -180,6 +188,7 @@ module Main
         model_id = args["model-id"]
         separator = args["separator"]
         input = args["input"]
+        bundle = args["bundle"]
 
         if !is_alive(server)
             @error "server is not alive: $server"
@@ -212,6 +221,8 @@ module Main
         end
         @info "desc_map has $(length(desc_map)) entries"
 
+        deferred = []
+
         # Create requirements.
 
         for (id, map) in desc_map
@@ -225,6 +236,8 @@ module Main
 
             push!(operations, add_authorization(desc_iri, map["creator"]))
             push!(operations, add_rights(desc_iri, map["rights"]))
+
+            push!(deferred, add_import(bundle, desc_iri))
 
             # Get bound values for mass.
 
@@ -342,6 +355,9 @@ module Main
             update(server, operations, true)
         end
 
+        update(server, deferred, true)
+        @info "description bundle $bundle updated"
+        
         @info "end BuildRequirements"
         exit(0)
     end
