@@ -3,6 +3,7 @@ module Main
 using ArgParse
 using JSON3
 using HTTP
+using OrderedCollections
 
 const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 const RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label"
@@ -215,7 +216,7 @@ end
 
 function (@main)(ARGS)
 
-    quantity_map = Dict(
+    quantity_map = OrderedDict(
         "mass" => "MassQuantity",
         "Cx" => "CenterOfMassQuantity",
         "Cy" => "CenterOfMassQuantity",
