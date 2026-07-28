@@ -92,7 +92,7 @@ module Main
             "sigma_Ixy" => string(row["sigma_Ixy"]),
             "sigma_Ixz" => string(row["sigma_Ixz"]),
             "sigma_Iyz" => string(row["sigma_Iyz"])
-                    )
+        )
     end
 
     function (@main)(ARGS)
