@@ -304,6 +304,7 @@ function (@main)(ARGS)
             (supplied_comp_d_iri, supplied_comp_d_ns) = description_iri_ns(args["namespace-base"], "$authorizer/C/" * supplied_comp, args["separator"])
             supplied_comp_iri = instance_iri(supplied_comp_d_ns, supplied_comp)
 
+            (supplied_comp_qd_iri, supplied_comp_qd_ns) = description_iri_ns(args["namespace-base"], "$authorizer/Q/" * supplied_comp, args["separator"])
             (supplied_comp_qvd_iri, supplied_comp_qvd_ns) = description_iri_ns(args["namespace-base"], "$authority/QV", args["separator"])
 
         else
@@ -497,16 +498,28 @@ function (@main)(ARGS)
                     iri_from_name[item] = item_iri
                  end
 
+                # create quantities description
+
+                (child_qd_iri, child_qd_ns) = description_iri_ns(args["namespace-base"], "$authority/Q/$comp", args["separator"])
+                child_qd_prefix = "$(comp)_Q"
+                push!(operations, add_description(child_qd_ns, child_qd_prefix, args["path-base"]))
+                push!(operations, add_authorization(child_qd_iri, authorizing_iri))
+                push!(deferred, add_import(db_ns, child_qd_ns))
+
+                # add rights for authorized work package
+                
+                push!(operations, add_rights(child_qd_iri, child_wp_iri))
+
                 # create mass property quantities
 
                 for (quantity, kind) in quantity_map
                     q_name = comp * "_" * quantity
-                    q_iri = instance_iri(child_cd_ns, q_name)
-                    push!(operations, create_instance(child_cd_iri, q_name))
-                    push!(operations, add_annotation(child_cd_iri, q_iri, RDFS_LABEL, quantity))
-                    push!(operations, add_assertion(child_cd_iri, q_iri, HAS_QUANTITY_IDENTIFIER, q_name))
-                    push!(operations, add_assertion(child_cd_iri, q_iri, RDF_TYPE, "http://studioj.us/metrology#$kind"))
-                    push!(operations, add_assertion(child_cd_iri, q_iri, CHARACTERIZES, child_comp_iri))
+                    q_iri = instance_iri(child_qd_ns, q_name)
+                    push!(operations, create_instance(child_qd_iri, q_name))
+                    push!(operations, add_annotation(child_qd_iri, q_iri, RDFS_LABEL, quantity))
+                    push!(operations, add_assertion(child_qd_iri, q_iri, HAS_QUANTITY_IDENTIFIER, q_name))
+                    push!(operations, add_assertion(child_qd_iri, q_iri, RDF_TYPE, "http://studioj.us/metrology#$kind"))
+                    push!(operations, add_assertion(child_qd_iri, q_iri, CHARACTERIZES, child_comp_iri))
                 end
 
                 # create quantity value description for child workpackage
@@ -547,7 +560,7 @@ function (@main)(ARGS)
             for (quantity, kind) in quantity_map
                 q_name = supplied_comp * "_" * quantity
                 qv_name = q_name * "_value"
-                q_iri = instance_iri(supplied_comp_d_ns, q_name)
+                q_iri = instance_iri(supplied_comp_qd_ns, q_name)
                 qv_iri = instance_iri(supplied_comp_qvd_ns, qv_name)
                 qtype = replace(kind, "Quantity" => "Value")
                 push!(operations, create_instance(supplied_comp_qvd_iri, qv_name))
