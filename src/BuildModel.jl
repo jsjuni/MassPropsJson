@@ -436,6 +436,10 @@ function (@main)(ARGS)
                 push!(operations, add_authorization(child_cd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_cd_ns))
 
+                # add rights for authorized work package
+                
+                push!(operations, add_rights(child_cd_iri, child_wp_iri))
+
                 # create component
 
                 push!(operations, create_instance(child_cd_iri, comp))
@@ -454,29 +458,38 @@ function (@main)(ARGS)
                     push!(operations, add_assertion(sbsd_iri, parent_comp_iri, CONTAINS, child_comp_iri))
                 end
 
-                # add rights for authorized work package
-                
-                push!(operations, add_rights(child_cd_iri, child_wp_iri))
-
-                # add supplies relation from work package to component
+                 # add supplies relation from work package to component
 
                 push!(operations, add_assertion(child_wpd_iri, child_wp_iri, SUPPLIES, child_comp_iri))
 
+                # create interface description
+
+                (child_ifd_iri, child_ifd_ns) = description_iri_ns(args["namespace-base"], "$authority/IF/$comp", args["separator"])
+                child_ifd_prefix = "$(comp)_IF"
+                push!(operations, add_description(child_ifd_ns, child_ifd_prefix, args["path-base"]))
+                push!(operations, add_authorization(child_ifd_iri, authorizing_iri))
+                push!(deferred, add_import(db_ns, child_ifd_ns))
+
+                # add rights for authorized work package
+                
+                push!(operations, add_rights(child_ifd_iri, child_wp_iri))
+
                 # create interfaces
 
+                push!(operations, create_instance_ref(child_ifd_ns, child_comp_iri))
                 for i in ("in", "out")
                     if_name = "IF.$(comp)_$i"
-                    push!(operations, create_instance(child_cd_iri, if_name))
-                    if_iri = instance_iri(child_cd_ns, if_name)
-                    push!(operations, add_assertion(child_cd_iri, if_iri, RDF_TYPE, INTERFACE))
-                    push!(operations, add_assertion(child_cd_iri, if_iri, HAS_INTERFACE_IDENTIFIER, if_name))
-                    push!(operations, add_assertion(child_cd_iri, child_comp_iri, PRESENTS, if_iri))
+                    push!(operations, create_instance(child_ifd_iri, if_name))
+                    if_iri = instance_iri(child_ifd_ns, if_name)
+                    push!(operations, add_assertion(child_ifd_iri, if_iri, RDF_TYPE, INTERFACE))
+                    push!(operations, add_assertion(child_ifd_iri, if_iri, HAS_INTERFACE_IDENTIFIER, if_name))
+                    push!(operations, add_assertion(child_ifd_iri, child_comp_iri, PRESENTS, if_iri))
                     item = authority_data["transfers"][comp][i]
                     transfers = i == "in" ? TRANSFERS_IN : TRANSFERS_OUT
                     it_name = item in authority_data["items"] ? "$authority/IT/$item" : "$authorizer/IT/$item"
                     (child_itd_iri, child_itd_ns) = description_iri_ns(args["namespace-base"], it_name, args["separator"])
                     item_iri = instance_iri(child_itd_ns, item)
-                    push!(operations, add_assertion(child_cd_iri, if_iri, transfers, item_iri))
+                    push!(operations, add_assertion(child_ifd_iri, if_iri, transfers, item_iri))
                     if item in authority_data["items"]
                         push!(operations, add_rights(child_itd_iri, child_wp_iri))
                     end
