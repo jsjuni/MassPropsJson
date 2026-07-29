@@ -231,7 +231,7 @@ module Main
 
             # Create description.
 
-            desc_iri = replace(map["g"], "/C/" => "/R/")
+            desc_iri = replace(map["g"], "/Q/" => "/R/")
             push!(operations, add_description(desc_iri, "$(id)_R", args["path-base"]))
 
             push!(operations, add_authorization(desc_iri, map["creator"]))
