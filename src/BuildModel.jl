@@ -13,7 +13,6 @@ const HAS_CANONICAL_NAME = "http://imce.jpl.nasa.gov/foundation/base#hasCanonica
 const CONTAINS = "http://imce.jpl.nasa.gov/foundation/base#contains"
 const PRESENTS = "http://imce.jpl.nasa.gov/foundation/mission#presents"
 const AUTHORIZES = "http://imce.jpl.nasa.gov/foundation/project#authorizes"
-const CHARACTERIZES = "http://imce.jpl.nasa.gov/foundation/analysis#characterizes"
 const WORK_PACKAGE = "http://imce.jpl.nasa.gov/foundation/project#WorkPackage"
 const PROJECT = "http://imce.jpl.nasa.gov/foundation/project#Project"
 const COMPONENT = "http://imce.jpl.nasa.gov/foundation/mission#Component"
@@ -21,20 +20,19 @@ const ITEM = "http://imce.jpl.nasa.gov/foundation/mission#Item"
 const INTERFACE = "http://imce.jpl.nasa.gov/foundation/mission#Interface"
 const JUNCTION = "http://imce.jpl.nasa.gov/foundation/mission#Junction"
 const SUPPLIES = "http://imce.jpl.nasa.gov/foundation/project#supplies"
-const HAS_NUMBER = "<http://studioj.us/metrology#hasNumber>"
-const HAS_UNIT = "<http://studioj.us/metrology#hasUnit>"
-const HAS_POI_CONVENTION = "<http://studioj.us/metrology#hasPoiConvention>"
-const IS_POINT_MASS = "<http://studioj.us/metrology#isPointMass>"
-const HAS_COMPONENT_IDENTIFIER = "<http://studioj.us/base#hasComponentIdentifier>"
-const HAS_INTERFACE_IDENTIFIER = "<http://studioj.us/base#hasInterfaceIdentifier>"
-const HAS_JUNCTION_IDENTIFIER = "<http://studioj.us/base#hasJunctionIdentifier>"
-const HAS_ITEM_IDENTIFIER = "<http://studioj.us/base#hasItemIdentifier>"
-const HAS_WORK_PACKAGE_IDENTIFIER = "<http://studioj.us/base#hasWorkPackageIdentifier>"
-const HAS_PROJECT_IDENTIFIER = "<http://studioj.us/base#hasProjectIdentifier>"
-const HAS_QUANTITY_IDENTIFIER = "<http://studioj.us/metrology#hasQuantityIdentifier>"
-const KG_UNIT = "<http://studioj.us/units#kg>"
-const MM_UNIT = "<http://studioj.us/units#mm>"
-const KG_MM_2_UNIT = "<http://studioj.us/units#kg_mm_2>"
+const HAS_NUMBER = "http://bipm.org/jcgm/vim3-v#hasNumber"
+const HAS_POI_CONVENTION = "http://studioj.us/mass-properties#hasPoiConvention>"
+const IS_POINT_MASS = "http://studioj.us/mass-properties#isPointMass"
+const HAS_COMPONENT_IDENTIFIER = "http://studioj.us/base#hasComponentIdentifier"
+const HAS_INTERFACE_IDENTIFIER = "http://studioj.us/base#hasInterfaceIdentifier"
+const HAS_JUNCTION_IDENTIFIER = "http://studioj.us/base#hasJunctionIdentifier"
+const HAS_ITEM_IDENTIFIER = "http://studioj.us/base#hasItemIdentifier"
+const HAS_WORK_PACKAGE_IDENTIFIER = "http://studioj.us/base#hasWorkPackageIdentifier"
+const HAS_PROJECT_IDENTIFIER = "http://studioj.us/base#hasProjectIdentifier"
+const HAS_QUANTITY_IDENTIFIER = "http://bipm.org/jcgm/vim3-v#hasQuantityIdentifier"
+const KG_UNIT = "http://iso.org/iso-80000-4.1-d#kilogram"
+const METRE_UNIT = "http://iso.org/iso-80000-3.1-d#metre"
+const KG_METRE_SQUARED_UNIT = "http://iso.org/iso-80000-4.7-d#kilogram_metre_squared"
 const HAS_SORT_KEY = "<http://imce.jpl.nasa.gov/foundation/base#hasSortKey>"
 const TRANSFERS_IN = "http://imce.jpl.nasa.gov/foundation/mission#transfersIn"
 const TRANSFERS_OUT = "http://imce.jpl.nasa.gov/foundation/mission#transfersOut"
@@ -43,6 +41,9 @@ const HAS_IDENTIFIER = "http://imce.jpl.nasa.gov/foundation/base#hasIdentifier"
 const JOINS1 = "http://imce.jpl.nasa.gov/foundation/mission#joins1"
 const JOINS2 = "http://imce.jpl.nasa.gov/foundation/mission#joins2"
 const STUDIOJ_BUNDLE = "http://studioj.us/bundle#"
+const IS_PROPERTY_OF = "http://bipm.org/jcgm/vim3-v#isPropertyOf"
+const EXPRESSES_MAGNITUDE_OF = "http://bipm.org/jcgm/vim3-v#expressesMagnitudeOf"
+const HAS_REFERENCE = "http://bipm.org/jcgm/vim3-v#hasReference"
 
 const MULTI_LEVEL = Dict(
     "C.1.2.2" => Dict(
@@ -217,33 +218,40 @@ end
 function (@main)(ARGS)
 
     quantity_map = OrderedDict(
-        "mass" => "MassQuantity",
-        "Cx" => "CenterOfMassQuantity",
-        "Cy" => "CenterOfMassQuantity",
-        "Cz" => "CenterOfMassQuantity",
-        "Ixx" => "MomentOfInertiaQuantity",
-        "Iyy" => "MomentOfInertiaQuantity",
-        "Izz" => "MomentOfInertiaQuantity",
-        "Ixy" => "ProductOfInertiaQuantity",
-        "Ixz" => "ProductOfInertiaQuantity",
-        "Iyz" => "ProductOfInertiaQuantity",
-        "sigma_mass" => "MassQuantity",
-        "sigma_Cx" => "CenterOfMassQuantity",
-        "sigma_Cy" => "CenterOfMassQuantity",
-        "sigma_Cz" => "CenterOfMassQuantity",
-        "sigma_Ixx" => "MomentOfInertiaQuantity",
-        "sigma_Iyy" => "MomentOfInertiaQuantity",
-        "sigma_Izz" => "MomentOfInertiaQuantity",
-        "sigma_Ixy" => "ProductOfInertiaQuantity",
-        "sigma_Ixz" => "ProductOfInertiaQuantity",
-        "sigma_Iyz" => "ProductOfInertiaQuantity"
+        "mass" => "Mass",
+        "Cx" => "CenterOfMassCoordinate",
+        "Cy" => "CenterOfMassCoordinate",
+        "Cz" => "CenterOfMassCoordinate",
+        "Ixx" => "MomentOfInertia",
+        "Iyy" => "MomentOfInertia",
+        "Izz" => "MomentOfInertia",
+        "Ixy" => "ProductOfInertia",
+        "Ixz" => "ProductOfInertia",
+        "Iyz" => "ProductOfInertia",
+        "sigma_mass" => "Mass",
+        "sigma_Cx" => "CenterOfMassCoordinate",
+        "sigma_Cy" => "CenterOfMassCoordinate",
+        "sigma_Cz" => "CenterOfMassCoordinate",
+        "sigma_Ixx" => "MomentOfInertia",
+        "sigma_Iyy" => "MomentOfInertia",
+        "sigma_Izz" => "MomentOfInertia",
+        "sigma_Ixy" => "ProductOfInertia",
+        "sigma_Ixz" => "ProductOfInertia",
+        "sigma_Iyz" => "ProductOfInertia"
     )
 
     unit_map = Dict(
-        "MassQuantity" => KG_UNIT,
-        "CenterOfMassQuantity" => MM_UNIT,
-        "MomentOfInertiaQuantity" => KG_MM_2_UNIT,
-        "ProductOfInertiaQuantity" => KG_MM_2_UNIT
+        "Mass" => KG_UNIT,
+        "CenterOfMassCoordinate" => METRE_UNIT,
+        "MomentOfInertia" => KG_METRE_SQUARED_UNIT,
+        "ProductOfInertia" => KG_METRE_SQUARED_UNIT
+    )
+
+    scale_map = Dict(
+        "Mass" => 1.0,
+        "CenterOfMassCoordinate" => 1.0e-3,
+        "MomentOfInertia" => 1.0e-6,
+        "ProductOfInertia" => 1.0e-6
     )
 
     args = parse_commandline()
@@ -519,8 +527,8 @@ function (@main)(ARGS)
                     push!(operations, create_instance(child_qd_iri, q_name))
                     push!(operations, add_annotation(child_qd_iri, q_iri, RDFS_LABEL, quantity))
                     push!(operations, add_assertion(child_qd_iri, q_iri, HAS_QUANTITY_IDENTIFIER, q_name))
-                    push!(operations, add_assertion(child_qd_iri, q_iri, RDF_TYPE, "http://studioj.us/metrology#$kind"))
-                    push!(operations, add_assertion(child_qd_iri, q_iri, CHARACTERIZES, child_comp_iri))
+                    push!(operations, add_assertion(child_qd_iri, q_iri, RDF_TYPE, "http://studioj.us/mass-properties#$kind"))
+                    push!(operations, add_assertion(child_qd_iri, q_iri, IS_PROPERTY_OF, child_comp_iri))
                 end
 
                 # create quantity value description for child workpackage
@@ -563,16 +571,16 @@ function (@main)(ARGS)
                 qv_name = q_name * "_value"
                 q_iri = instance_iri(supplied_comp_qd_ns, q_name)
                 qv_iri = instance_iri(supplied_comp_qvd_ns, qv_name)
-                qtype = replace(kind, "Quantity" => "Value")
+                qtype = "$(kind)Value"
                 push!(operations, create_instance(supplied_comp_qvd_iri, qv_name))
                 push!(operations, add_annotation(supplied_comp_qvd_iri, qv_iri, RDFS_LABEL, quantity))
-                push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, RDF_TYPE, "http://studioj.us/metrology#$qtype"))
-                push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, CHARACTERIZES, q_iri))
+                push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, RDF_TYPE, "http://studioj.us/mass-properties#$qtype"))
+                push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, EXPRESSES_MAGNITUDE_OF, q_iri))
 
                 if haskey(authority_data, "hasValues") && haskey(authority_data["hasValues"], quantity)
-                    value = parse(Float64, authority_data["hasValues"][quantity])
+                    value = parse(Float64, authority_data["hasValues"][quantity]) * scale_map[kind]
                     push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, HAS_NUMBER, Dict("\$type" => "DoubleLiteral", "value" => value)))
-                    push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, HAS_UNIT, unit_map[kind]))
+                    push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, HAS_REFERENCE, unit_map[kind]))
                 end
             end
 
