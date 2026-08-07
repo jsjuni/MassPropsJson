@@ -40,7 +40,8 @@ const TRAVERSES = "http://imce.jpl.nasa.gov/foundation/mission#traverses"
 const HAS_IDENTIFIER = "http://imce.jpl.nasa.gov/foundation/base#hasIdentifier"
 const JOINS1 = "http://imce.jpl.nasa.gov/foundation/mission#joins1"
 const JOINS2 = "http://imce.jpl.nasa.gov/foundation/mission#joins2"
-const STUDIOJ_BUNDLE = "http://studioj.us/bundle#"
+const STUDIOJ_BUNDLE_D = "http://studioj.us/bundle-d#"
+const STUDIOJ_BUNDLE_V = "http://studioj.us/bundle-v#"
 const IS_PROPERTY_OF = "http://bipm.org/jcgm/vim3-v#isPropertyOf"
 const EXPRESSES_MAGNITUDE_OF = "http://bipm.org/jcgm/vim3-v#expressesMagnitudeOf"
 const HAS_REFERENCE = "http://bipm.org/jcgm/vim3-v#hasReference"
@@ -285,7 +286,8 @@ function (@main)(ARGS)
     db_prefix = "description-bundle"
 
     push!(deferred, add_description_bundle(db_ns, db_prefix, args["path-base"]))
-    push!(deferred, add_import(db_ns, STUDIOJ_BUNDLE))
+    push!(deferred, add_import(db_ns, STUDIOJ_BUNDLE_V))
+    push!(deferred, add_import(db_ns, STUDIOJ_BUNDLE_D))
 
     for (i, v) in enumerate(vl)
         if args["limit"] > 0 && i > args["limit"]
