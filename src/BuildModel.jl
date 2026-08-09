@@ -30,9 +30,9 @@ const HAS_ITEM_IDENTIFIER = "http://studioj.us/base#hasItemIdentifier"
 const HAS_WORK_PACKAGE_IDENTIFIER = "http://studioj.us/base#hasWorkPackageIdentifier"
 const HAS_PROJECT_IDENTIFIER = "http://studioj.us/base#hasProjectIdentifier"
 const HAS_QUANTITY_IDENTIFIER = "http://bipm.org/jcgm/vim3-v#hasQuantityIdentifier"
-const KG_UNIT = "http://iso.org/iso-80000-4.1-d#kilogram"
-const METRE_UNIT = "http://iso.org/iso-80000-3.1-d#metre"
-const KG_METRE_SQUARED_UNIT = "http://iso.org/iso-80000-4.7-d#kilogram_metre_squared"
+const KG_UNIT = "http://iso.org/iso-80000/4.1-d#kilogram"
+const METRE_UNIT = "http://iso.org/iso-80000/3.1-d#metre"
+const KG_METRE_SQUARED_UNIT = "http://iso.org/iso-80000/4.7-d#kilogram_metre_squared"
 const HAS_SORT_KEY = "<http://imce.jpl.nasa.gov/foundation/base#hasSortKey>"
 const TRANSFERS_IN = "http://imce.jpl.nasa.gov/foundation/mission#transfersIn"
 const TRANSFERS_OUT = "http://imce.jpl.nasa.gov/foundation/mission#transfersOut"
@@ -42,7 +42,10 @@ const JOINS1 = "http://imce.jpl.nasa.gov/foundation/mission#joins1"
 const JOINS2 = "http://imce.jpl.nasa.gov/foundation/mission#joins2"
 const STUDIOJ_BUNDLE_D = "http://studioj.us/bundle-d#"
 const STUDIOJ_BUNDLE_V = "http://studioj.us/bundle-v#"
-const IS_PROPERTY_OF = "http://bipm.org/jcgm/vim3-v#isPropertyOf"
+const IS_MASS_OF = "http://studioj.us/mass-properties#isMassOf"
+const IS_CENTER_OF_MASS_COORDINATE_OF = "http://studioj.us/mass-properties#isCenterOfMassCoordinateOf"
+const IS_MOMENT_OF_INERTIA_OF = "http://studioj.us/mass-properties#isMomentOfInertiaOf"
+const IS_PRODUCT_OF_INERTIA_OF = "http://studioj.us/mass-properties#isProductOfInertiaOf"
 const EXPRESSES_MAGNITUDE_OF = "http://bipm.org/jcgm/vim3-v#expressesMagnitudeOf"
 const HAS_REFERENCE = "http://bipm.org/jcgm/vim3-v#hasReference"
 
@@ -239,6 +242,13 @@ function (@main)(ARGS)
         "sigma_Ixy" => "ProductOfInertia",
         "sigma_Ixz" => "ProductOfInertia",
         "sigma_Iyz" => "ProductOfInertia"
+    )
+
+    is_property_map = Dict(
+        "Mass" => IS_MASS_OF,
+        "CenterOfMassCoordinate" => IS_CENTER_OF_MASS_COORDINATE_OF,
+        "MomentOfInertia" => IS_MOMENT_OF_INERTIA_OF,
+        "ProductOfInertia" => IS_PRODUCT_OF_INERTIA_OF
     )
 
     unit_map = Dict(
@@ -526,11 +536,12 @@ function (@main)(ARGS)
                 for (quantity, kind) in quantity_map
                     q_name = comp * "_" * quantity
                     q_iri = instance_iri(child_qd_ns, q_name)
+                    is_property_of = is_property_map[kind]
                     push!(operations, create_instance(child_qd_iri, q_name))
                     push!(operations, add_annotation(child_qd_iri, q_iri, RDFS_LABEL, quantity))
                     push!(operations, add_assertion(child_qd_iri, q_iri, HAS_QUANTITY_IDENTIFIER, q_name))
                     push!(operations, add_assertion(child_qd_iri, q_iri, RDF_TYPE, "http://studioj.us/mass-properties#$kind"))
-                    push!(operations, add_assertion(child_qd_iri, q_iri, IS_PROPERTY_OF, child_comp_iri))
+                    push!(operations, add_assertion(child_qd_iri, q_iri, is_property_of, child_comp_iri))
                 end
 
                 # create quantity value description for child workpackage
