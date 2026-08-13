@@ -4,6 +4,7 @@ using ArgParse
 using JSON3
 using HTTP
 using OrderedCollections
+using Logging
 
 const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 const RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label"
@@ -275,7 +276,7 @@ function (@main)(ARGS)
     server = args["server"]
 
     if !is_alive(server)
-        println("Server is not alive at ", args["server"])
+        @info "Server is not alive at " args["server"]
         exit(1)
     end
 
@@ -302,7 +303,7 @@ function (@main)(ARGS)
 
     for (i, v) in enumerate(vl)
         if args["limit"] > 0 && i > args["limit"]
-            println("Reached limit of ", args["limit"], " components. Stopping.")
+            @info "Reached limit of $(args["limit"]) components. Stopping."
             break
         end
         authority = String(v.first)
@@ -545,12 +546,13 @@ function (@main)(ARGS)
                     push!(operations, add_assertion(child_qd_iri, q_iri, is_property_of, child_comp_iri))
                 end
 
-                # create quantity value description for child workpackage
+                # create quantity value description for child work package
 
                 (child_qvd_iri, child_qvd_ns) = description_iri_ns(args["namespace-base"], "$wp/QV", args["separator"])
                 child_qvd_prefix = String(wp) * "_QV"
                 push!(operations, add_description(child_qvd_ns, child_qvd_prefix, args["path-base"]))
                 push!(operations, add_authorization(child_qvd_iri, child_wp_iri))
+                @info "add rights for $authorizing_iri to $child_qvd_iri"
                 push!(deferred, add_rights(child_qvd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_qvd_ns))
 
@@ -611,16 +613,16 @@ function (@main)(ARGS)
         t1 = time()
         update(server, operations, args["defer-diagnostics"])
         t2 = time()
-        println("Updated server for ", authority, " (", i, ") ", length(operations), " operations in ", round(t2 - t1, digits=2), " s")
+        @info "Updated server for $authority ($i): $(length(operations)) in operations in $(round(t2 - t1, digits=2)) s"
 
     end
 
     t1 = time()
     update(server, deferred, args["defer-diagnostics"])
     t2 = time()
-    println("Updated server for description bundle with ", length(deferred), " operations in ", round(t2 - t1, digits=2), " s")
+    @info "Updated server for description bundle: $(length(deferred)) operations in $(round(t2 - t1, digits=2)) s"
     end_time = time()
-    println("finished in ", round(end_time - start_time, digits=2), " s")
+    @info "finished in $(round(end_time - start_time, digits=2)) s"
 
     exit(0)
 end
