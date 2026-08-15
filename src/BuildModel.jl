@@ -2,9 +2,9 @@ module Main
 
 using ArgParse
 using JSON3
-using HTTP
 using OrderedCollections
 using Logging
+using OMLCodeAPI
 
 const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 const RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label"
@@ -22,8 +22,8 @@ const INTERFACE = "http://imce.jpl.nasa.gov/foundation/mission#Interface"
 const JUNCTION = "http://imce.jpl.nasa.gov/foundation/mission#Junction"
 const SUPPLIES = "http://imce.jpl.nasa.gov/foundation/project#supplies"
 const HAS_NUMBER = "http://bipm.org/jcgm/vim3-v#hasNumber"
-const HAS_POI_CONVENTION = "http://studioj.us/mass-properties#hasPoiConvention>"
-const IS_POINT_MASS = "http://studioj.us/mass-properties#isPointMass"
+const HAS_POI_CONVENTION = "http://studioj.us/mass-properties-v#hasPoiConvention>"
+const IS_POINT_MASS = "http://studioj.us/mass-properties-v#isPointMass"
 const HAS_COMPONENT_IDENTIFIER = "http://studioj.us/base#hasComponentIdentifier"
 const HAS_INTERFACE_IDENTIFIER = "http://studioj.us/base#hasInterfaceIdentifier"
 const HAS_JUNCTION_IDENTIFIER = "http://studioj.us/base#hasJunctionIdentifier"
@@ -44,10 +44,10 @@ const JOINS2 = "http://imce.jpl.nasa.gov/foundation/mission#joins2"
 const STUDIOJ_BUNDLE_D = "http://studioj.us/bundle-d#"
 const STUDIOJ_BUNDLE_V = "http://studioj.us/bundle-v#"
 const IS_PROPERTY_OF = "http://bipm.org/jcgm/vim3-v#isPropertyOf"
-const IS_MASS_OF = "http://studioj.us/mass-properties#isMassOf"
-const IS_CENTER_OF_MASS_COORDINATE_OF = "http://studioj.us/mass-properties#isCenterOfMassCoordinateOf"
-const IS_MOMENT_OF_INERTIA_OF = "http://studioj.us/mass-properties#isMomentOfInertiaOf"
-const IS_PRODUCT_OF_INERTIA_OF = "http://studioj.us/mass-properties#isProductOfInertiaOf"
+const IS_MASS_OF = "http://studioj.us/mass-properties-v#isMassOf"
+const IS_CENTER_OF_MASS_COORDINATE_OF = "http://studioj.us/mass-properties-v#isCenterOfMassCoordinateOf"
+const IS_MOMENT_OF_INERTIA_OF = "http://studioj.us/mass-properties-v#isMomentOfInertiaOf"
+const IS_PRODUCT_OF_INERTIA_OF = "http://studioj.us/mass-properties-v#isProductOfInertiaOf"
 const EXPRESSES_MAGNITUDE_OF = "http://bipm.org/jcgm/vim3-v#expressesMagnitudeOf"
 const HAS_REFERENCE = "http://bipm.org/jcgm/vim3-v#hasReference"
 
@@ -95,20 +95,6 @@ function parse_commandline()
     return parse_args(s)
 end
 
-function is_alive(server)
-    resp = HTTP.get("$server/health")
-    return resp.status == 200
-end
-
-function update(server, operations, defer_diagnostics=false)
-    body = Dict("operations" => operations, "deferDiagnostics" => defer_diagnostics)
-    resp = HTTP.post("$server/v0/update", headers=Dict("Content-Type" => "application/json"), body=JSON3.write(body))
-    # open("/tmp/log.txt", "a") do log
-    #     println(log, "Response: ", resp.status, " - ", String(resp.body))
-    # end
-    return resp.status == 200
-end
-
 function delete_description(namespace)
     Dict(
         "deleteOntology" => Dict(
@@ -139,72 +125,12 @@ function add_description_bundle(namespace, prefix, path)
     )
 end
 
-function add_import(importing, imported)
-    Dict(
-        "addImport" => Dict(
-            "importingIri" => importing,
-            "importedIri" => imported,
-        )
-    )
-end
-
-function add_annotation(ontologyIri, subjectIri, predicateIri, object)
-    Dict(
-        "addAnnotation" => Dict(
-            "ontologyIri" => ontologyIri,
-            "subjectIri" => subjectIri,
-            "predicateIri" => predicateIri,
-            "object" => object
-        )
-    )
-end
-
 function add_authorization(iri, authorizer)
     add_annotation(iri, iri, DC_CREATOR, Dict("datatypeIri" => "http://www.w3.org/2001/XMLSchema#anyURI", "value" => authorizer))
 end
 
 function add_rights(iri, grantee)
     add_annotation(iri, iri, DC_RIGHTS, Dict("datatypeIri" => "http://www.w3.org/2001/XMLSchema#anyURI", "value" => grantee))
-end
-
-function create_instance(description_iri, name)
-    Dict(
-        "createInstance" => Dict(
-            "descriptionIri" => description_iri,
-            "instanceName" => name
-        )
-    )
-end
-
-function create_instance_ref(description_iri, iri)
-    Dict(
-        "createInstanceRef" => Dict(
-            "descriptionIri" => description_iri,
-            "instanceIri" => iri
-        )
-    )
-end
-
-function add_assertion(description_iri, subject_iri, predicate_iri, object_iri)
-    Dict(
-        "addAssertion" => Dict(
-            "descriptionIri" => description_iri,
-            "subjectIri" => subject_iri,
-            "predicateIri" => predicate_iri,
-            "object" => object_iri
-        )
-    )
-end
-
-function add_annotation(ontologyIri, subjectIri, predicateIri, object)
-    Dict(
-        "addAnnotation" => Dict(
-            "ontologyIri" => ontologyIri,
-            "subjectIri" => subjectIri,
-            "predicateIri" => predicateIri,
-            "object" => object
-        )
-    )
 end
 
 function xsd_double(value)
@@ -542,7 +468,7 @@ function (@main)(ARGS)
                     push!(operations, create_instance(child_qd_iri, q_name))
                     push!(operations, add_annotation(child_qd_iri, q_iri, RDFS_LABEL, quantity))
                     push!(operations, add_assertion(child_qd_iri, q_iri, HAS_QUANTITY_IDENTIFIER, q_name))
-                    push!(operations, add_assertion(child_qd_iri, q_iri, RDF_TYPE, "http://studioj.us/mass-properties#$kind"))
+                    push!(operations, add_assertion(child_qd_iri, q_iri, RDF_TYPE, "http://studioj.us/mass-properties-v#$kind"))
                     push!(operations, add_assertion(child_qd_iri, q_iri, is_property_of, child_comp_iri))
                 end
 
@@ -552,7 +478,6 @@ function (@main)(ARGS)
                 child_qvd_prefix = String(wp) * "_QV"
                 push!(operations, add_description(child_qvd_ns, child_qvd_prefix, args["path-base"]))
                 push!(operations, add_authorization(child_qvd_iri, child_wp_iri))
-                @info "add rights for $authorizing_iri to $child_qvd_iri"
                 push!(deferred, add_rights(child_qvd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_qvd_ns))
 
@@ -590,7 +515,7 @@ function (@main)(ARGS)
                 qtype = "$(kind)Value"
                 push!(operations, create_instance(supplied_comp_qvd_iri, qv_name))
                 push!(operations, add_annotation(supplied_comp_qvd_iri, qv_iri, RDFS_LABEL, quantity))
-                push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, RDF_TYPE, "http://studioj.us/mass-properties#$qtype"))
+                push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, RDF_TYPE, "http://studioj.us/mass-properties-v#$qtype"))
                 push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, EXPRESSES_MAGNITUDE_OF, q_iri))
 
                 if haskey(authority_data, "hasValues") && haskey(authority_data["hasValues"], quantity)
