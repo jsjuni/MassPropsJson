@@ -1,5 +1,6 @@
 module Main
 
+    using OMLCodeAPI
     using ArgParse
     using Logging
     using HTTP
@@ -11,11 +12,11 @@ module Main
     using MassProps
     using CSV
 
-    const HAS_NUMBER = "<http://studioj.us/metrology#hasNumber>"
-    const HAS_UNIT = "<http://studioj.us/metrology#hasUnit>"
-    const KG_UNIT = "<http://studioj.us/units#kg>"
-    const MM_UNIT = "<http://studioj.us/units#mm>"
-    const KG_MM_2_UNIT = "<http://studioj.us/units#kg_mm_2>"
+    const HAS_NUMBER = "http://bipm.org/jcgm/vim3-v#hasNumber"
+    const HAS_UNIT = "http://bipm.org/jcgm/vim3-v#hasReference"
+    const KG_UNIT = "http://iso.org/iso-80000/4.1-d#kilogram"
+    const MM_UNIT = "http://iso.org/iso-80000/3.1-d#metre"
+    const KG_MM_2_UNIT = "http://iso.org/iso-80000/4.7-d#kilogram_metre_squared"
 
     const MASS_PROPS = [
         "mass",
@@ -36,7 +37,6 @@ module Main
         PREFIX analysis: <http://imce.jpl.nasa.gov/foundation/analysis#>
         PREFIX mission: <http://imce.jpl.nasa.gov/foundation/mission#>
         PREFIX project: <http://imce.jpl.nasa.gov/foundation/project#>
-        PREFIX metrology: <http://studioj.us/metrology#>
         SELECT ?id ?pid
 
         WHERE {
@@ -62,7 +62,8 @@ module Main
         PREFIX analysis: <http://imce.jpl.nasa.gov/foundation/analysis#>
         PREFIX mission: <http://imce.jpl.nasa.gov/foundation/mission#>
         PREFIX project: <http://imce.jpl.nasa.gov/foundation/project#>
-        PREFIX metrology: <http://studioj.us/metrology#>
+	    PREFIX vim3-v: <http://bipm.org/jcgm/vim3-v#>
+        PREFIX mass-properties-v: <http://studioj.us/mass-properties-v#>
         SELECT ?id ?mass ?Cx ?Cy ?Cz ?Ixx ?Iyy ?Izz ?Ixy ?Ixz ?Iyz
                     ?sigma_mass ?sigma_Cx ?sigma_Cy ?sigma_Cz ?sigma_Ixx ?sigma_Iyy ?sigma_Izz ?sigma_Ixy ?sigma_Ixz ?sigma_Iyz
 
@@ -73,166 +74,167 @@ module Main
 
             # get mass properties
 
-                [ a metrology:MassValue ;
-                    analysis:characterizes [
-                        a metrology:MassQuantity ;
+                [ a mass-properties-v:MassValue ;
+                    vim3-v:expressesMagnitudeOf [
+                        a mass-properties-v:Mass ;
                         rdfs:label "mass" ;
-                        analysis:characterizes ?component
+                        mass-properties-v:isMassOf ?component
                     ] ;
-                    metrology:hasNumber ?mass 
+                    vim3-v:hasNumber ?mass 
                 ] .
-                [ a metrology:CenterOfMassValue ;
-                    analysis:characterizes [
-                        a metrology:CenterOfMassQuantity ;
+		
+                [ a mass-properties-v:CenterOfMassCoordinateValue ;
+                    vim3-v:expressesMagnitudeOf [
+                        a mass-properties-v:CenterOfMassCoordinate ;
                         rdfs:label "Cx" ;
-                        analysis:characterizes ?component
+                        mass-properties-v:isCenterOfMassCoordinateOf ?component
                     ] ;
-                    metrology:hasNumber ?Cx
+                    vim3-v:hasNumber ?Cx
                 ] .
-                [ a metrology:CenterOfMassValue ;
-                    analysis:characterizes [
-                        a metrology:CenterOfMassQuantity ;
+                [ a mass-properties-v:CenterOfMassCoordinateValue ;
+                    vim3-v:expressesMagnitudeOf [
+                        a mass-properties-v:CenterOfMassCoordinate ;
                         rdfs:label "Cy" ;
-                        analysis:characterizes ?component
+                        mass-properties-v:isCenterOfMassCoordinateOf ?component
                     ] ;
-                    metrology:hasNumber ?Cy
+                    vim3-v:hasNumber ?Cy
                 ] .
-                [ a metrology:CenterOfMassValue ;
-                    analysis:characterizes [
-                        a metrology:CenterOfMassQuantity ;
+                [ a mass-properties-v:CenterOfMassCoordinateValue ;
+                    vim3-v:expressesMagnitudeOf [
+                        a mass-properties-v:CenterOfMassCoordinate ;
                         rdfs:label "Cz" ;
-                        analysis:characterizes ?component
+                        mass-properties-v:isCenterOfMassCoordinateOf ?component
                     ] ;
-                    metrology:hasNumber ?Cz
+                    vim3-v:hasNumber ?Cz
                 ] .
-                [ a metrology:MomentOfInertiaValue ;
-                    analysis:characterizes [
-                        a metrology:MomentOfInertiaQuantity ;
+                [ a mass-properties-v:MomentOfInertiaValue ;
+                    vim3-v:expressesMagnitudeOf [
+                        a mass-properties-v:MomentOfInertia ;
                         rdfs:label "Ixx" ;
-                        analysis:characterizes ?component
+                        mass-properties-v:isMomentOfInertiaOf ?component
                     ] ;
-                    metrology:hasNumber ?Ixx
+                    vim3-v:hasNumber ?Ixx
                 ] .
-                [ a metrology:MomentOfInertiaValue ;
-                    analysis:characterizes [
-                        a metrology:MomentOfInertiaQuantity ;
+                [ a mass-properties-v:MomentOfInertiaValue ;
+                    vim3-v:expressesMagnitudeOf [
+                        a mass-properties-v:MomentOfInertia ;
                         rdfs:label "Iyy" ;
-                        analysis:characterizes ?component
+                        mass-properties-v:isMomentOfInertiaOf ?component
                     ] ;
-                    metrology:hasNumber ?Iyy
+                    vim3-v:hasNumber ?Iyy
                 ] .
-                [ a metrology:MomentOfInertiaValue ;
-                    analysis:characterizes [
-                        a metrology:MomentOfInertiaQuantity ;
+                [ a mass-properties-v:MomentOfInertiaValue ;
+                    vim3-v:expressesMagnitudeOf [
+                        a mass-properties-v:MomentOfInertia ;
                         rdfs:label "Izz" ;
-                        analysis:characterizes ?component
+                        mass-properties-v:isMomentOfInertiaOf ?component
                     ] ;
-                    metrology:hasNumber ?Izz
+                    vim3-v:hasNumber ?Izz
                 ] .
-                [ a metrology:ProductOfInertiaValue ;
-                    analysis:characterizes [
-                        a metrology:ProductOfInertiaQuantity ;
+                [ a mass-properties-v:ProductOfInertiaValue ;
+                    vim3-v:expressesMagnitudeOf [
+                        a mass-properties-v:ProductOfInertia ;
                         rdfs:label "Ixy" ;
-                        analysis:characterizes ?component
+                        mass-properties-v:isProductOfInertiaOf ?component
                     ] ;
-                    metrology:hasNumber ?Ixy
+                    vim3-v:hasNumber ?Ixy
                 ] .
-                [ a metrology:ProductOfInertiaValue ;
-                    analysis:characterizes [
-                        a metrology:ProductOfInertiaQuantity ;
+                [ a mass-properties-v:ProductOfInertiaValue ;
+                    vim3-v:expressesMagnitudeOf [
+                        a mass-properties-v:ProductOfInertia ;
                         rdfs:label "Ixz" ;
-                        analysis:characterizes ?component
+                        mass-properties-v:isProductOfInertiaOf ?component
                     ] ;
-                    metrology:hasNumber ?Ixz
+                    vim3-v:hasNumber ?Ixz
                 ] .
-                [ a metrology:ProductOfInertiaValue ;
-                    analysis:characterizes [
-                        a metrology:ProductOfInertiaQuantity ;
+                [ a mass-properties-v:ProductOfInertiaValue ;
+                    vim3-v:expressesMagnitudeOf [
+                        a mass-properties-v:ProductOfInertia ;
                         rdfs:label "Iyz" ;
-                        analysis:characterizes ?component
+                        mass-properties-v:isProductOfInertiaOf ?component
                     ] ;
-                    metrology:hasNumber ?Iyz
+                    vim3-v:hasNumber ?Iyz
                 ] .
                 
-                    [ a metrology:MassValue ;
-                        analysis:characterizes [
-                            a metrology:MassQuantity ;
+                    [ a mass-properties-v:MassValue ;
+                        vim3-v:expressesMagnitudeOf [
+                            a mass-properties-v:Mass ;
                             rdfs:label "sigma_mass" ;
-                            analysis:characterizes ?component
+                            mass-properties-v:isMassOf ?component
                         ] ;
-                        metrology:hasNumber ?sigma_mass
+                        vim3-v:hasNumber ?sigma_mass
                     ] .
-                    [ a metrology:CenterOfMassValue ;
-                        analysis:characterizes [
-                            a metrology:CenterOfMassQuantity ;
+                    [ a mass-properties-v:CenterOfMassCoordinateValue ;
+                        vim3-v:expressesMagnitudeOf [
+                            a mass-properties-v:CenterOfMassCoordinate ;
                             rdfs:label "sigma_Cx" ;
-                            analysis:characterizes ?component
+                            mass-properties-v:isCenterOfMassCoordinateOf ?component
                         ] ;
-                        metrology:hasNumber ?sigma_Cx
+                        vim3-v:hasNumber ?sigma_Cx
                     ] .
-                    [ a metrology:CenterOfMassValue ;
-                        analysis:characterizes [
-                            a metrology:CenterOfMassQuantity ;
+                    [ a mass-properties-v:CenterOfMassCoordinateValue ;
+                        vim3-v:expressesMagnitudeOf [
+                            a mass-properties-v:CenterOfMassCoordinate ;
                             rdfs:label "sigma_Cy" ;
-                            analysis:characterizes ?component
+                            mass-properties-v:isCenterOfMassCoordinateOf ?component
                         ] ;
-                        metrology:hasNumber ?sigma_Cy
+                        vim3-v:hasNumber ?sigma_Cy
                     ] .
-                    [ a metrology:CenterOfMassValue ;
-                        analysis:characterizes [
-                            a metrology:CenterOfMassQuantity ;
+                    [ a mass-properties-v:CenterOfMassCoordinateValue ;
+                        vim3-v:expressesMagnitudeOf [
+                            a mass-properties-v:CenterOfMassCoordinate ;
                             rdfs:label "sigma_Cz" ;
-                            analysis:characterizes ?component
+                            mass-properties-v:isCenterOfMassCoordinateOf ?component
                         ] ;
-                        metrology:hasNumber ?sigma_Cz
+                        vim3-v:hasNumber ?sigma_Cz
                     ] .
-                    [ a metrology:MomentOfInertiaValue ;
-                        analysis:characterizes [
-                            a metrology:MomentOfInertiaQuantity ;
+                    [ a mass-properties-v:MomentOfInertiaValue ;
+                        vim3-v:expressesMagnitudeOf [
+                            a mass-properties-v:MomentOfInertia ;
                             rdfs:label "sigma_Ixx" ;
-                            analysis:characterizes ?component
+                            mass-properties-v:isMomentOfInertiaOf ?component
                         ] ;
-                        metrology:hasNumber ?sigma_Ixx
+                        vim3-v:hasNumber ?sigma_Ixx
                     ] .
-                    [ a metrology:MomentOfInertiaValue ;
-                        analysis:characterizes [
-                            a metrology:MomentOfInertiaQuantity ;
+                    [ a mass-properties-v:MomentOfInertiaValue ;
+                        vim3-v:expressesMagnitudeOf [
+                            a mass-properties-v:MomentOfInertia ;
                             rdfs:label "sigma_Iyy" ;
-                            analysis:characterizes ?component
+                            mass-properties-v:isMomentOfInertiaOf ?component
                         ] ;
-                        metrology:hasNumber ?sigma_Iyy
+                        vim3-v:hasNumber ?sigma_Iyy
                     ] .
-                    [ a metrology:MomentOfInertiaValue ;
-                        analysis:characterizes [
-                            a metrology:MomentOfInertiaQuantity ;
+                    [ a mass-properties-v:MomentOfInertiaValue ;
+                        vim3-v:expressesMagnitudeOf [
+                            a mass-properties-v:MomentOfInertia ;
                             rdfs:label "sigma_Izz" ;
-                            analysis:characterizes ?component
+                            mass-properties-v:isMomentOfInertiaOf ?component
                         ] ;
-                        metrology:hasNumber ?sigma_Izz
+                        vim3-v:hasNumber ?sigma_Izz
                     ] .
-                    [ a metrology:ProductOfInertiaValue ;
-                        analysis:characterizes [
-                            a metrology:ProductOfInertiaQuantity ;
+                    [ a mass-properties-v:ProductOfInertiaValue ;
+                        vim3-v:expressesMagnitudeOf [
+                            a mass-properties-v:ProductOfInertia ;
                             rdfs:label "sigma_Ixy" ;
-                            analysis:characterizes ?component
+                            mass-properties-v:isProductOfInertiaOf ?component
                         ] ;
-                        metrology:hasNumber ?sigma_Ixy
+                        vim3-v:hasNumber ?sigma_Ixy
                     ] .
-                    [ a metrology:ProductOfInertiaValue ;
-                        analysis:characterizes [
-                            a metrology:ProductOfInertiaQuantity ;
+                    [ a mass-properties-v:ProductOfInertiaValue ;
+                        vim3-v:expressesMagnitudeOf [
+                            a mass-properties-v:ProductOfInertia ;
                             rdfs:label "sigma_Ixz" ;
-                            analysis:characterizes ?component
+                            mass-properties-v:isProductOfInertiaOf ?component
                         ] ;
-                        metrology:hasNumber ?sigma_Ixz
+                        vim3-v:hasNumber ?sigma_Ixz
                     ] .
-                    [ a metrology:ProductOfInertiaValue ;
-                        analysis:characterizes [
-                            a metrology:ProductOfInertiaQuantity ;
+                    [ a mass-properties-v:ProductOfInertiaValue ;
+                        vim3-v:expressesMagnitudeOf [
+                            a mass-properties-v:ProductOfInertia ;
                             rdfs:label "sigma_Iyz" ;
-                            analysis:characterizes ?component
+                            mass-properties-v:isProductOfInertiaOf ?component
                         ] ;
-                        metrology:hasNumber ?sigma_Iyz
+                        vim3-v:hasNumber ?sigma_Iyz
                     ] .
             
         }
@@ -246,7 +248,7 @@ module Main
         PREFIX analysis: <http://imce.jpl.nasa.gov/foundation/analysis#>
         PREFIX mission: <http://imce.jpl.nasa.gov/foundation/mission#>
         PREFIX project: <http://imce.jpl.nasa.gov/foundation/project#>
-        PREFIX metrology: <http://studioj.us/metrology#>
+	    PREFIX vim3-v: <http://bipm.org/jcgm/vim3-v#>
         SELECT ?id ?g
 
         WHERE {
@@ -255,10 +257,10 @@ module Main
                 base:hasIdentifier ?id .
 
             GRAPH ?g {
-                ?mv analysis:characterizes ?mq ;
+                ?mv vim3-v:expressesMagnitudeOf ?mq ;
                     rdfs:label "mass" .
             }
-            ?mq analysis:characterizes ?component .
+            ?mq vim3-v:isPropertyOf ?component .
         }
     """
 
@@ -306,41 +308,6 @@ module Main
             default = "/tmp/rollup-mass-props.csv"
         end
         return parse_args(s)
-    end
-
-    function is_alive(server)
-        resp = HTTP.get("$server/health")
-        return resp.status == 200
-    end
-
-    function run_query(server, model_id, query)
-       resp = HTTP.post("$server/v0/sparql/$model_id", body = query, headers = Dict("Content-Type" => "application/sparql-query"))
-        if resp.status != 200
-            @error "Query failed: $server/v0/sparql/$model_id"
-            @error "Response: $(resp.status) - $(String(resp.body))"
-            return nothing
-        end
-        return resp
-    end
-
-    function update(server, operations, defer_diagnostics=false)
-        body = Dict("operations" => operations, "deferDiagnostics" => defer_diagnostics)
-        resp = HTTP.post("$server/v0/update", headers=Dict("Content-Type" => "application/json"), body=JSON3.write(body))
-        # open("/tmp/log.txt", "a") do log
-        #     println(log, "Response: ", resp.status, " - ", String(resp.body))
-        # end
-        return resp.status == 200
-    end
-
-    function add_assertion(description_iri, subject_iri, predicate_iri, object_iri)
-        Dict(
-            "addAssertion" => Dict(
-                "descriptionIri" => description_iri,
-                "subjectIri" => subject_iri,
-                "predicateIri" => predicate_iri,
-                "object" => object_iri
-            )
-        )
     end
 
     function (@main)(ARGS)
