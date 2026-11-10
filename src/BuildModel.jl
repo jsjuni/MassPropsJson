@@ -223,6 +223,7 @@ function (@main)(ARGS)
     (db_iri, db_ns) = description_iri_ns(args["namespace-base"], "bundle", args["separator"])
     db_prefix = "description-bundle"
 
+    push!(deferred, delete_description(db_ns))
     push!(deferred, add_description_bundle(db_ns, db_prefix, args["path-base"]))
     push!(deferred, add_import(db_ns, STUDIOJ_BUNDLE_V))
     push!(deferred, add_import(db_ns, STUDIOJ_BUNDLE_D))
@@ -265,6 +266,7 @@ function (@main)(ARGS)
 
             authorizing_iri = instance_iri(authorizing_d_ns, authority)
 
+            push!(operations, delete_description(authorizing_d_ns))
             push!(operations, add_description(authorizing_d_ns, authorizing_d_prefix, args["path-base"]))
             push!(operations, create_instance(authorizing_d_iri, authority))
             push!(operations, add_assertion(authorizing_d_iri, authorizing_iri, RDF_TYPE, PROJECT))
@@ -295,10 +297,13 @@ function (@main)(ARGS)
 
             # create descriptions
 
+            push!(operations, delete_description(sbsd_ns))
             push!(operations, add_description(sbsd_ns, sbsd_prefix, args["path-base"]))
             push!(deferred, add_import(db_ns, sbsd_ns))
+            push!(operations, delete_description(wbsd_ns))
             push!(operations, add_description(wbsd_ns, wbsd_prefix, args["path-base"]))
             push!(deferred, add_import(db_ns, wbsd_ns))
+            push!(operations, delete_description(sisd_ns))
             push!(operations, add_description(sisd_ns, sisd_prefix, args["path-base"]))
             push!(deferred, add_import(db_ns, sisd_ns))
 
@@ -340,6 +345,7 @@ function (@main)(ARGS)
                 (child_itd_iri, child_itd_ns) = description_iri_ns(args["namespace-base"], "$authority/IT/$item", args["separator"])
                 child_itd_prefix = "$item"
 
+                push!(operations, delete_description(child_itd_ns))
                 push!(operations, add_description(child_itd_ns, child_itd_prefix, args["path-base"]))
                 push!(operations, add_authorization(child_itd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_itd_ns))
@@ -360,6 +366,7 @@ function (@main)(ARGS)
 
                 (child_wpd_iri, child_wpd_ns) = description_iri_ns(args["namespace-base"], "$authority/WP/$wp", args["separator"])
                 child_wpd_prefix = wp
+                push!(operations, delete_description(child_wpd_ns))
                 push!(operations, add_description(child_wpd_ns, child_wpd_prefix, args["path-base"]))
                 push!(operations, add_authorization(child_wpd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_wpd_ns))
@@ -382,6 +389,7 @@ function (@main)(ARGS)
 
                 (child_cd_iri, child_cd_ns) = description_iri_ns(args["namespace-base"], "$authority/C/$comp", args["separator"])
                 child_cd_prefix = comp
+                push!(operations, delete_description(child_cd_ns))
                 push!(operations, add_description(child_cd_ns, child_cd_prefix, args["path-base"]))
                 push!(operations, add_authorization(child_cd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_cd_ns))
@@ -416,6 +424,7 @@ function (@main)(ARGS)
 
                 (child_ifd_iri, child_ifd_ns) = description_iri_ns(args["namespace-base"], "$authority/IF/$comp", args["separator"])
                 child_ifd_prefix = "$(comp)_IF"
+                push!(operations, delete_description(child_ifd_ns))
                 push!(operations, add_description(child_ifd_ns, child_ifd_prefix, args["path-base"]))
                 push!(operations, add_authorization(child_ifd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_ifd_ns))
@@ -451,6 +460,7 @@ function (@main)(ARGS)
 
                 (child_qd_iri, child_qd_ns) = description_iri_ns(args["namespace-base"], "$authority/Q/$comp", args["separator"])
                 child_qd_prefix = "$(comp)_Q"
+                push!(operations, delete_description(child_qd_ns))
                 push!(operations, add_description(child_qd_ns, child_qd_prefix, args["path-base"]))
                 push!(operations, add_authorization(child_qd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_qd_ns))
@@ -476,6 +486,7 @@ function (@main)(ARGS)
 
                 (child_qvd_iri, child_qvd_ns) = description_iri_ns(args["namespace-base"], "$wp/QV", args["separator"])
                 child_qvd_prefix = String(wp) * "_QV"
+                push!(operations, delete_description(child_qvd_ns))
                 push!(operations, add_description(child_qvd_ns, child_qvd_prefix, args["path-base"]))
                 push!(operations, add_authorization(child_qvd_iri, child_wp_iri))
                 push!(deferred, add_rights(child_qvd_iri, authorizing_iri))
