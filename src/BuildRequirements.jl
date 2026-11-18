@@ -98,85 +98,12 @@ module Main
         return parse_args(s)
     end
 
-    function is_alive(server)
-        resp = HTTP.get("$server/health")
-        return resp.status == 200
-    end
-
-    function update(server, operations, defer_diagnostics=false)
-        body = Dict("operations" => operations, "deferDiagnostics" => defer_diagnostics)
-        resp = HTTP.post("$server/v0/update", headers=Dict("Content-Type" => "application/json"), body=JSON3.write(body))
-        # open("/tmp/log.txt", "a") do log
-        #     println(log, "Response: ", resp.status, " - ", String(resp.body))
-        # end
-        return resp.status == 200
-    end
-
-    function delete_description(namespace)
-        Dict(
-            "deleteOntology" => Dict(
-                "ontologyIri" => namespace
-            )
-        )
-    end
-
-    function add_description(namespace, prefix, path)
-        Dict(
-            "createOntology" => Dict(
-                "ontologyKind" => "description",
-                "ontologyNamespace" => namespace,
-                "ontologyPrefix" => prefix,
-                "targetFolder" => path
-            )
-        )
-    end
-
-    function add_import(importing, imported)
-        Dict(
-            "addImport" => Dict(
-                "importingIri" => importing,
-                "importedIri" => imported,
-            )
-        )
-    end
-
-    function add_assertion(description_iri, subject_iri, predicate_iri, object_iri)
-        Dict(
-            "addAssertion" => Dict(
-                "descriptionIri" => description_iri,
-                "subjectIri" => subject_iri,
-                "predicateIri" => predicate_iri,
-                "object" => object_iri
-            )
-        )
-    end
-
-    function add_annotation(ontologyIri, subjectIri, predicateIri, object)
-        Dict(
-            "addAnnotation" => Dict(
-                "ontologyIri" => ontologyIri,
-                "subjectIri" => subjectIri,
-                "predicateIri" => predicateIri,
-                "object" => object
-            )
-        )
-    end
-
     function add_authorization(iri, authorizer)
         add_annotation(iri, iri, DC_CREATOR, Dict("datatypeIri" => "http://www.w3.org/2001/XMLSchema#anyURI", "value" => authorizer))
     end
 
     function add_rights(iri, grantee)
         add_annotation(iri, iri, DC_RIGHTS, Dict("datatypeIri" => "http://www.w3.org/2001/XMLSchema#anyURI", "value" => grantee))
-    end
-
-    function create_instance(description_iri, name)
-        Dict(
-            "createInstance" => Dict(
-                "descriptionIri" => description_iri,
-                "instanceName" => name
-            )
-        )
     end
 
     function (@main)(ARGS)
@@ -232,8 +159,8 @@ module Main
             # Create description.
 
             desc_iri = replace(map["g"], "/Q/" => "/R/")
-            push!(operations, delete_description(desc_iri))
-            push!(operations, add_description(desc_iri, "$(id)_R", args["path-base"]))
+            push!(operations, delete_ontology(desc_iri))
+            push!(operations, create_ontology("description", desc_iri, "$(id)_R", args["path-base"]))
 
             push!(operations, add_authorization(desc_iri, map["creator"]))
             push!(operations, add_rights(desc_iri, map["rights"]))
