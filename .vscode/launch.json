@@ -7,22 +7,6 @@
         {
             "type": "julia",
             "request": "launch",
-            "name": "BuildRequirements",
-            "program": "${workspaceFolder}/src/BuildRequirements.jl",
-            "stopOnEntry": false,
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "type": "julia",
-            "request": "launch",
-            "name": "RollupMassProps",
-            "program": "${workspaceFolder}/src/RollupMassProps.jl",
-            "stopOnEntry": false,
-            "cwd": "${workspaceFolder}",
-        },
-        {
-            "type": "julia",
-            "request": "launch",
             "name": "BuildTree",
             "program": "${workspaceFolder}/src/BuildTree.jl",
             "stopOnEntry": false,
@@ -35,23 +19,6 @@
                 "--output", "${workspaceFolder}/build/wpx.json",
                 "--table", "${workspaceFolder}/data/mp_table.tsv",
             ]
-        },
-
-        {
-            "type": "julia",
-            "request": "launch",
-            "name": "MassPropsJson",
-            "program": "${workspaceFolder}/src/MassPropsJson.jl",
-            "stopOnEntry": false,
-            "cwd": "${workspaceFolder}",
-            "args": [
-                "--id", "child",
-                "--pid", "parent",
-                "--table", "${workspaceFolder}/data/mp_table.tsv",
-                "--edgelist", "${workspaceFolder}/data/mp_edges.tsv",
-                "--output", "${workspaceFolder}/build/wp5.json",
-                "--reject", "[67890]"
-            ],
         },
         {
             "type": "julia",
@@ -66,6 +33,22 @@
                 "--defer-diagnostics",
                 "--multi-level"
             ],
+        },
+        {
+            "type": "julia",
+            "request": "launch",
+            "name": "RollupMassProps",
+            "program": "${workspaceFolder}/src/RollupMassProps.jl",
+            "stopOnEntry": false,
+            "cwd": "${workspaceFolder}",
+        },
+        {
+            "type": "julia",
+            "request": "launch",
+            "name": "BuildRequirements",
+            "program": "${workspaceFolder}/src/BuildRequirements.jl",
+            "stopOnEntry": false,
+            "cwd": "${workspaceFolder}"
         }
     ]
 }
