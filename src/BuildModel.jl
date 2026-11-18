@@ -2,8 +2,9 @@ module Main
 
 using ArgParse
 using JSON3
-using HTTP
 using OrderedCollections
+using Logging
+using OMLCodeAPI
 
 const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
 const RDFS_LABEL = "http://www.w3.org/2000/01/rdf-schema#label"
@@ -13,7 +14,6 @@ const HAS_CANONICAL_NAME = "http://imce.jpl.nasa.gov/foundation/base#hasCanonica
 const CONTAINS = "http://imce.jpl.nasa.gov/foundation/base#contains"
 const PRESENTS = "http://imce.jpl.nasa.gov/foundation/mission#presents"
 const AUTHORIZES = "http://imce.jpl.nasa.gov/foundation/project#authorizes"
-const CHARACTERIZES = "http://imce.jpl.nasa.gov/foundation/analysis#characterizes"
 const WORK_PACKAGE = "http://imce.jpl.nasa.gov/foundation/project#WorkPackage"
 const PROJECT = "http://imce.jpl.nasa.gov/foundation/project#Project"
 const COMPONENT = "http://imce.jpl.nasa.gov/foundation/mission#Component"
@@ -21,20 +21,19 @@ const ITEM = "http://imce.jpl.nasa.gov/foundation/mission#Item"
 const INTERFACE = "http://imce.jpl.nasa.gov/foundation/mission#Interface"
 const JUNCTION = "http://imce.jpl.nasa.gov/foundation/mission#Junction"
 const SUPPLIES = "http://imce.jpl.nasa.gov/foundation/project#supplies"
-const HAS_NUMBER = "<http://studioj.us/metrology#hasNumber>"
-const HAS_UNIT = "<http://studioj.us/metrology#hasUnit>"
-const HAS_POI_CONVENTION = "<http://studioj.us/metrology#hasPoiConvention>"
-const IS_POINT_MASS = "<http://studioj.us/metrology#isPointMass>"
-const HAS_COMPONENT_IDENTIFIER = "<http://studioj.us/base#hasComponentIdentifier>"
-const HAS_INTERFACE_IDENTIFIER = "<http://studioj.us/base#hasInterfaceIdentifier>"
-const HAS_JUNCTION_IDENTIFIER = "<http://studioj.us/base#hasJunctionIdentifier>"
-const HAS_ITEM_IDENTIFIER = "<http://studioj.us/base#hasItemIdentifier>"
-const HAS_WORK_PACKAGE_IDENTIFIER = "<http://studioj.us/base#hasWorkPackageIdentifier>"
-const HAS_PROJECT_IDENTIFIER = "<http://studioj.us/base#hasProjectIdentifier>"
-const HAS_QUANTITY_IDENTIFIER = "<http://studioj.us/metrology#hasQuantityIdentifier>"
-const KG_UNIT = "<http://studioj.us/units#kg>"
-const MM_UNIT = "<http://studioj.us/units#mm>"
-const KG_MM_2_UNIT = "<http://studioj.us/units#kg_mm_2>"
+const HAS_NUMBER = "http://bipm.org/jcgm/vim3-v#hasNumber"
+const HAS_POI_CONVENTION = "http://studioj.us/mass-properties-v#hasPoiConvention>"
+const IS_POINT_MASS = "http://studioj.us/mass-properties-v#isPointMass"
+const HAS_COMPONENT_IDENTIFIER = "http://studioj.us/base#hasComponentIdentifier"
+const HAS_INTERFACE_IDENTIFIER = "http://studioj.us/base#hasInterfaceIdentifier"
+const HAS_JUNCTION_IDENTIFIER = "http://studioj.us/base#hasJunctionIdentifier"
+const HAS_ITEM_IDENTIFIER = "http://studioj.us/base#hasItemIdentifier"
+const HAS_WORK_PACKAGE_IDENTIFIER = "http://studioj.us/base#hasWorkPackageIdentifier"
+const HAS_PROJECT_IDENTIFIER = "http://studioj.us/base#hasProjectIdentifier"
+const HAS_QUANTITY_IDENTIFIER = "http://bipm.org/jcgm/vim3-v#hasQuantityIdentifier"
+const KG_UNIT = "http://iso.org/iso-80000/4.1-d#kilogram"
+const METRE_UNIT = "http://iso.org/iso-80000/3.1-d#metre"
+const KG_METRE_SQUARED_UNIT = "http://iso.org/iso-80000/4.7-d#kilogram_metre_squared"
 const HAS_SORT_KEY = "<http://imce.jpl.nasa.gov/foundation/base#hasSortKey>"
 const TRANSFERS_IN = "http://imce.jpl.nasa.gov/foundation/mission#transfersIn"
 const TRANSFERS_OUT = "http://imce.jpl.nasa.gov/foundation/mission#transfersOut"
@@ -42,7 +41,15 @@ const TRAVERSES = "http://imce.jpl.nasa.gov/foundation/mission#traverses"
 const HAS_IDENTIFIER = "http://imce.jpl.nasa.gov/foundation/base#hasIdentifier"
 const JOINS1 = "http://imce.jpl.nasa.gov/foundation/mission#joins1"
 const JOINS2 = "http://imce.jpl.nasa.gov/foundation/mission#joins2"
-const STUDIOJ_BUNDLE = "http://studioj.us/bundle#"
+const STUDIOJ_BUNDLE_D = "http://studioj.us/bundle-d#"
+const STUDIOJ_BUNDLE_V = "http://studioj.us/bundle-v#"
+const IS_PROPERTY_OF = "http://bipm.org/jcgm/vim3-v#isPropertyOf"
+const IS_MASS_OF = "http://studioj.us/mass-properties-v#isMassOf"
+const IS_CENTER_OF_MASS_COORDINATE_OF = "http://studioj.us/mass-properties-v#isCenterOfMassCoordinateOf"
+const IS_MOMENT_OF_INERTIA_OF = "http://studioj.us/mass-properties-v#isMomentOfInertiaOf"
+const IS_PRODUCT_OF_INERTIA_OF = "http://studioj.us/mass-properties-v#isProductOfInertiaOf"
+const EXPRESSES_MAGNITUDE_OF = "http://bipm.org/jcgm/vim3-v#expressesMagnitudeOf"
+const HAS_REFERENCE = "http://bipm.org/jcgm/vim3-v#hasReference"
 
 const MULTI_LEVEL = Dict(
     "C.1.2.2" => Dict(
@@ -88,116 +95,12 @@ function parse_commandline()
     return parse_args(s)
 end
 
-function is_alive(server)
-    resp = HTTP.get("$server/health")
-    return resp.status == 200
-end
-
-function update(server, operations, defer_diagnostics=false)
-    body = Dict("operations" => operations, "deferDiagnostics" => defer_diagnostics)
-    resp = HTTP.post("$server/v0/update", headers=Dict("Content-Type" => "application/json"), body=JSON3.write(body))
-    # open("/tmp/log.txt", "a") do log
-    #     println(log, "Response: ", resp.status, " - ", String(resp.body))
-    # end
-    return resp.status == 200
-end
-
-function delete_description(namespace)
-    Dict(
-        "deleteOntology" => Dict(
-            "ontologyIri" => namespace
-        )
-    )
-end
-
-function add_description(namespace, prefix, path)
-    Dict(
-        "createOntology" => Dict(
-            "ontologyKind" => "description",
-            "ontologyNamespace" => namespace,
-            "ontologyPrefix" => prefix,
-            "targetFolder" => path
-        )
-    )
-end
-
-function add_description_bundle(namespace, prefix, path)
-    Dict(
-        "createOntology" => Dict(
-            "ontologyKind" => "description bundle",
-            "ontologyNamespace" => namespace,
-            "ontologyPrefix" => prefix,
-            "targetFolder" => path
-        )
-    )
-end
-
-function add_import(importing, imported)
-    Dict(
-        "addImport" => Dict(
-            "importingIri" => importing,
-            "importedIri" => imported,
-        )
-    )
-end
-
-function add_annotation(ontologyIri, subjectIri, predicateIri, object)
-    Dict(
-        "addAnnotation" => Dict(
-            "ontologyIri" => ontologyIri,
-            "subjectIri" => subjectIri,
-            "predicateIri" => predicateIri,
-            "object" => object
-        )
-    )
-end
-
 function add_authorization(iri, authorizer)
     add_annotation(iri, iri, DC_CREATOR, Dict("datatypeIri" => "http://www.w3.org/2001/XMLSchema#anyURI", "value" => authorizer))
 end
 
 function add_rights(iri, grantee)
     add_annotation(iri, iri, DC_RIGHTS, Dict("datatypeIri" => "http://www.w3.org/2001/XMLSchema#anyURI", "value" => grantee))
-end
-
-function create_instance(description_iri, name)
-    Dict(
-        "createInstance" => Dict(
-            "descriptionIri" => description_iri,
-            "instanceName" => name
-        )
-    )
-end
-
-function create_instance_ref(description_iri, iri)
-    Dict(
-        "createInstanceRef" => Dict(
-            "descriptionIri" => description_iri,
-            "instanceIri" => iri
-        )
-    )
-end
-
-function add_assertion(description_iri, subject_iri, predicate_iri, object_iri)
-    Dict(
-        "addAssertion" => Dict(
-            "descriptionIri" => description_iri,
-            "subjectIri" => subject_iri,
-            "predicateIri" => predicate_iri,
-            "object" => object_iri
-        )
-    )
-end
-
-function add_annotation(ontologyIri, subjectIri, predicateIri, object)
-    Dict(
-        "addAnnotation" => Dict(
-            "ontologyIri" => ontologyIri,
-            "subjectIri" => subjectIri,
-            "predicateIri" => predicateIri,
-            "object" => object
-        )
-    )
 end
 
 function xsd_double(value)
@@ -217,33 +120,47 @@ end
 function (@main)(ARGS)
 
     quantity_map = OrderedDict(
-        "mass" => "MassQuantity",
-        "Cx" => "CenterOfMassQuantity",
-        "Cy" => "CenterOfMassQuantity",
-        "Cz" => "CenterOfMassQuantity",
-        "Ixx" => "MomentOfInertiaQuantity",
-        "Iyy" => "MomentOfInertiaQuantity",
-        "Izz" => "MomentOfInertiaQuantity",
-        "Ixy" => "ProductOfInertiaQuantity",
-        "Ixz" => "ProductOfInertiaQuantity",
-        "Iyz" => "ProductOfInertiaQuantity",
-        "sigma_mass" => "MassQuantity",
-        "sigma_Cx" => "CenterOfMassQuantity",
-        "sigma_Cy" => "CenterOfMassQuantity",
-        "sigma_Cz" => "CenterOfMassQuantity",
-        "sigma_Ixx" => "MomentOfInertiaQuantity",
-        "sigma_Iyy" => "MomentOfInertiaQuantity",
-        "sigma_Izz" => "MomentOfInertiaQuantity",
-        "sigma_Ixy" => "ProductOfInertiaQuantity",
-        "sigma_Ixz" => "ProductOfInertiaQuantity",
-        "sigma_Iyz" => "ProductOfInertiaQuantity"
+        "mass" => "Mass",
+        "Cx" => "CenterOfMassCoordinate",
+        "Cy" => "CenterOfMassCoordinate",
+        "Cz" => "CenterOfMassCoordinate",
+        "Ixx" => "MomentOfInertia",
+        "Iyy" => "MomentOfInertia",
+        "Izz" => "MomentOfInertia",
+        "Ixy" => "ProductOfInertia",
+        "Ixz" => "ProductOfInertia",
+        "Iyz" => "ProductOfInertia",
+        "sigma_mass" => "Mass",
+        "sigma_Cx" => "CenterOfMassCoordinate",
+        "sigma_Cy" => "CenterOfMassCoordinate",
+        "sigma_Cz" => "CenterOfMassCoordinate",
+        "sigma_Ixx" => "MomentOfInertia",
+        "sigma_Iyy" => "MomentOfInertia",
+        "sigma_Izz" => "MomentOfInertia",
+        "sigma_Ixy" => "ProductOfInertia",
+        "sigma_Ixz" => "ProductOfInertia",
+        "sigma_Iyz" => "ProductOfInertia"
+    )
+
+    is_property_map = Dict(
+        "Mass" => IS_MASS_OF,
+        "CenterOfMassCoordinate" => IS_CENTER_OF_MASS_COORDINATE_OF,
+        "MomentOfInertia" => IS_MOMENT_OF_INERTIA_OF,
+        "ProductOfInertia" => IS_PRODUCT_OF_INERTIA_OF
     )
 
     unit_map = Dict(
-        "MassQuantity" => KG_UNIT,
-        "CenterOfMassQuantity" => MM_UNIT,
-        "MomentOfInertiaQuantity" => KG_MM_2_UNIT,
-        "ProductOfInertiaQuantity" => KG_MM_2_UNIT
+        "Mass" => KG_UNIT,
+        "CenterOfMassCoordinate" => METRE_UNIT,
+        "MomentOfInertia" => KG_METRE_SQUARED_UNIT,
+        "ProductOfInertia" => KG_METRE_SQUARED_UNIT
+    )
+
+    scale_map = Dict(
+        "Mass" => 1.0,
+        "CenterOfMassCoordinate" => 1.0e-3,
+        "MomentOfInertia" => 1.0e-6,
+        "ProductOfInertia" => 1.0e-6
     )
 
     args = parse_commandline()
@@ -255,7 +172,7 @@ function (@main)(ARGS)
     server = args["server"]
 
     if !is_alive(server)
-        println("Server is not alive at ", args["server"])
+        @info "Server is not alive at " args["server"]
         exit(1)
     end
 
@@ -276,12 +193,14 @@ function (@main)(ARGS)
     (db_iri, db_ns) = description_iri_ns(args["namespace-base"], "bundle", args["separator"])
     db_prefix = "description-bundle"
 
-    push!(deferred, add_description_bundle(db_ns, db_prefix, args["path-base"]))
-    push!(deferred, add_import(db_ns, STUDIOJ_BUNDLE))
+    push!(deferred, delete_ontology(db_ns))
+    push!(deferred, create_ontology("description bundle", db_ns, db_prefix, args["path-base"]))
+    push!(deferred, add_import(db_ns, STUDIOJ_BUNDLE_V))
+    push!(deferred, add_import(db_ns, STUDIOJ_BUNDLE_D))
 
     for (i, v) in enumerate(vl)
         if args["limit"] > 0 && i > args["limit"]
-            println("Reached limit of ", args["limit"], " components. Stopping.")
+            @info "Reached limit of $(args["limit"]) components. Stopping."
             break
         end
         authority = String(v.first)
@@ -317,7 +236,8 @@ function (@main)(ARGS)
 
             authorizing_iri = instance_iri(authorizing_d_ns, authority)
 
-            push!(operations, add_description(authorizing_d_ns, authorizing_d_prefix, args["path-base"]))
+            push!(operations, delete_ontology(authorizing_d_ns))
+            push!(operations, create_ontology("description", authorizing_d_ns, authorizing_d_prefix, args["path-base"]))
             push!(operations, create_instance(authorizing_d_iri, authority))
             push!(operations, add_assertion(authorizing_d_iri, authorizing_iri, RDF_TYPE, PROJECT))
             push!(operations, add_assertion(authorizing_d_iri, authorizing_iri, HAS_PROJECT_IDENTIFIER, authority))
@@ -347,11 +267,14 @@ function (@main)(ARGS)
 
             # create descriptions
 
-            push!(operations, add_description(sbsd_ns, sbsd_prefix, args["path-base"]))
+            push!(operations, delete_ontology(sbsd_ns))
+            push!(operations, create_ontology("description", sbsd_ns, sbsd_prefix, args["path-base"]))
             push!(deferred, add_import(db_ns, sbsd_ns))
-            push!(operations, add_description(wbsd_ns, wbsd_prefix, args["path-base"]))
+            push!(operations, delete_ontology(wbsd_ns))
+            push!(operations, create_ontology("description", wbsd_ns, wbsd_prefix, args["path-base"]))
             push!(deferred, add_import(db_ns, wbsd_ns))
-            push!(operations, add_description(sisd_ns, sisd_prefix, args["path-base"]))
+            push!(operations, delete_ontology(sisd_ns))
+            push!(operations, create_ontology("description", sisd_ns, sisd_prefix, args["path-base"]))
             push!(deferred, add_import(db_ns, sisd_ns))
 
            # add authorization annotations to descriptions
@@ -392,7 +315,8 @@ function (@main)(ARGS)
                 (child_itd_iri, child_itd_ns) = description_iri_ns(args["namespace-base"], "$authority/IT/$item", args["separator"])
                 child_itd_prefix = "$item"
 
-                push!(operations, add_description(child_itd_ns, child_itd_prefix, args["path-base"]))
+                push!(operations, delete_ontology(child_itd_ns))
+                push!(operations, create_ontology("description", child_itd_ns, child_itd_prefix, args["path-base"]))
                 push!(operations, add_authorization(child_itd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_itd_ns))
 
@@ -412,7 +336,8 @@ function (@main)(ARGS)
 
                 (child_wpd_iri, child_wpd_ns) = description_iri_ns(args["namespace-base"], "$authority/WP/$wp", args["separator"])
                 child_wpd_prefix = wp
-                push!(operations, add_description(child_wpd_ns, child_wpd_prefix, args["path-base"]))
+                push!(operations, delete_ontology(child_wpd_ns))
+                push!(operations, create_ontology("description", child_wpd_ns, child_wpd_prefix, args["path-base"]))
                 push!(operations, add_authorization(child_wpd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_wpd_ns))
 
@@ -434,7 +359,8 @@ function (@main)(ARGS)
 
                 (child_cd_iri, child_cd_ns) = description_iri_ns(args["namespace-base"], "$authority/C/$comp", args["separator"])
                 child_cd_prefix = comp
-                push!(operations, add_description(child_cd_ns, child_cd_prefix, args["path-base"]))
+                push!(operations, delete_ontology(child_cd_ns))
+                push!(operations, create_ontology("description", child_cd_ns, child_cd_prefix, args["path-base"]))
                 push!(operations, add_authorization(child_cd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_cd_ns))
 
@@ -468,7 +394,8 @@ function (@main)(ARGS)
 
                 (child_ifd_iri, child_ifd_ns) = description_iri_ns(args["namespace-base"], "$authority/IF/$comp", args["separator"])
                 child_ifd_prefix = "$(comp)_IF"
-                push!(operations, add_description(child_ifd_ns, child_ifd_prefix, args["path-base"]))
+                push!(operations, delete_ontology(child_ifd_ns))
+                push!(operations, create_ontology("description", child_ifd_ns, child_ifd_prefix, args["path-base"]))
                 push!(operations, add_authorization(child_ifd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_ifd_ns))
 
@@ -503,7 +430,8 @@ function (@main)(ARGS)
 
                 (child_qd_iri, child_qd_ns) = description_iri_ns(args["namespace-base"], "$authority/Q/$comp", args["separator"])
                 child_qd_prefix = "$(comp)_Q"
-                push!(operations, add_description(child_qd_ns, child_qd_prefix, args["path-base"]))
+                push!(operations, delete_ontology(child_qd_ns))
+                push!(operations, create_ontology("description", child_qd_ns, child_qd_prefix, args["path-base"]))
                 push!(operations, add_authorization(child_qd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_qd_ns))
 
@@ -516,18 +444,20 @@ function (@main)(ARGS)
                 for (quantity, kind) in quantity_map
                     q_name = comp * "_" * quantity
                     q_iri = instance_iri(child_qd_ns, q_name)
+                    is_property_of = is_property_map[kind]
                     push!(operations, create_instance(child_qd_iri, q_name))
                     push!(operations, add_annotation(child_qd_iri, q_iri, RDFS_LABEL, quantity))
                     push!(operations, add_assertion(child_qd_iri, q_iri, HAS_QUANTITY_IDENTIFIER, q_name))
-                    push!(operations, add_assertion(child_qd_iri, q_iri, RDF_TYPE, "http://studioj.us/metrology#$kind"))
-                    push!(operations, add_assertion(child_qd_iri, q_iri, CHARACTERIZES, child_comp_iri))
+                    push!(operations, add_assertion(child_qd_iri, q_iri, RDF_TYPE, "http://studioj.us/mass-properties-v#$kind"))
+                    push!(operations, add_assertion(child_qd_iri, q_iri, is_property_of, child_comp_iri))
                 end
 
-                # create quantity value description for child workpackage
+                # create quantity value description for child work package
 
                 (child_qvd_iri, child_qvd_ns) = description_iri_ns(args["namespace-base"], "$wp/QV", args["separator"])
                 child_qvd_prefix = String(wp) * "_QV"
-                push!(operations, add_description(child_qvd_ns, child_qvd_prefix, args["path-base"]))
+                push!(operations, delete_ontology(child_qvd_ns))
+                push!(operations, create_ontology("description", child_qvd_ns, child_qvd_prefix, args["path-base"]))
                 push!(operations, add_authorization(child_qvd_iri, child_wp_iri))
                 push!(deferred, add_rights(child_qvd_iri, authorizing_iri))
                 push!(deferred, add_import(db_ns, child_qvd_ns))
@@ -563,16 +493,16 @@ function (@main)(ARGS)
                 qv_name = q_name * "_value"
                 q_iri = instance_iri(supplied_comp_qd_ns, q_name)
                 qv_iri = instance_iri(supplied_comp_qvd_ns, qv_name)
-                qtype = replace(kind, "Quantity" => "Value")
+                qtype = "$(kind)Value"
                 push!(operations, create_instance(supplied_comp_qvd_iri, qv_name))
                 push!(operations, add_annotation(supplied_comp_qvd_iri, qv_iri, RDFS_LABEL, quantity))
-                push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, RDF_TYPE, "http://studioj.us/metrology#$qtype"))
-                push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, CHARACTERIZES, q_iri))
+                push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, RDF_TYPE, "http://studioj.us/mass-properties-v#$qtype"))
+                push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, EXPRESSES_MAGNITUDE_OF, q_iri))
 
                 if haskey(authority_data, "hasValues") && haskey(authority_data["hasValues"], quantity)
-                    value = parse(Float64, authority_data["hasValues"][quantity])
+                    value = parse(Float64, authority_data["hasValues"][quantity]) * scale_map[kind]
                     push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, HAS_NUMBER, Dict("\$type" => "DoubleLiteral", "value" => value)))
-                    push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, HAS_UNIT, unit_map[kind]))
+                    push!(operations, add_assertion(supplied_comp_qvd_iri, qv_iri, HAS_REFERENCE, unit_map[kind]))
                 end
             end
 
@@ -589,16 +519,16 @@ function (@main)(ARGS)
         t1 = time()
         update(server, operations, args["defer-diagnostics"])
         t2 = time()
-        println("Updated server for ", authority, " (", i, ") ", length(operations), " operations in ", round(t2 - t1, digits=2), " s")
+        @info "Updated server for $authority ($i): $(length(operations)) in operations in $(round(t2 - t1, digits=2)) s"
 
     end
 
     t1 = time()
     update(server, deferred, args["defer-diagnostics"])
     t2 = time()
-    println("Updated server for description bundle with ", length(deferred), " operations in ", round(t2 - t1, digits=2), " s")
+    @info "Updated server for description bundle: $(length(deferred)) operations in $(round(t2 - t1, digits=2)) s"
     end_time = time()
-    println("finished in ", round(end_time - start_time, digits=2), " s")
+    @info "finished in $(round(end_time - start_time, digits=2)) s"
 
     exit(0)
 end

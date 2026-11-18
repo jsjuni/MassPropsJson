@@ -12,6 +12,7 @@ module Main
     using CSV
     using Distributions
     using Printf
+    using OMLCodeAPI
 
     const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
     const REQUIREMENT = "http://imce.jpl.nasa.gov/foundation/mission#Requirement"
@@ -24,13 +25,13 @@ module Main
     const EXPLAINS = "http://imce.jpl.nasa.gov/foundation/analysis#explains"
     const REQUIRES = "http://imce.jpl.nasa.gov/foundation/analysis#requires"
     const DC_RIGHTS = "http://purl.org/dc/elements/1.1/rights"
-    const HAS_NUMBER = "<http://studioj.us/metrology#hasNumber>"
-    const HAS_UNIT = "<http://studioj.us/metrology#hasUnit>"
-    const KG_UNIT = "<http://studioj.us/units#kg>"
-    const MM_UNIT = "<http://studioj.us/units#mm>"
-    const KG_MM_2_UNIT = "<http://studioj.us/units#kg_mm_2>"
-    const MASS_VALUE = "<http://studioj.us/metrology#MassValue>"
-    const LENGTH_VALUE = "<http://studioj.us/metrology#LengthValue>"
+    const HAS_NUMBER = "http://bipm.org/jcgm/vim3-v#hasNumber>"
+    const HAS_REFERENCE = "http://bipm.org/jcgm/vim3-v#hasReference>"
+    const KG_UNIT = "<http://iso.org/iso-80000/4.1-d#kilogram>"
+    const MM_UNIT = "<http://iso.org/iso-80000/3.1-d#millimetre>"
+    const KG_MM_2_UNIT = "<http://iso.org/iso-80000/4.7-v#kilogram-metre-squared>"
+    const MASS_VALUE = "<http://studioj.us/mass-properties-v#MassValue>"
+    const CENTER_OF_MASS_COORDINATE = "<http://studioj.us/mass-properties-v#CenterOfMassCoordinate>"
 
     const DESC_QUERY = """
         PREFIX dc: <http://purl.org/dc/elements/1.1/>
@@ -41,20 +42,21 @@ module Main
         PREFIX mission: <http://imce.jpl.nasa.gov/foundation/mission#>
         PREFIX project: <http://imce.jpl.nasa.gov/foundation/project#>
         PREFIX metrology: <http://studioj.us/metrology#>
-        SELECT ?id ?name ?g ?creator ?rights
+        PREFIX mass-properties-v: <http://studioj.us/mass-properties-v#>
 
+        SELECT ?id ?name ?g ?creator ?rights
         WHERE {
 
             ?component a mission:Component ;
                 base:hasIdentifier ?id ;
                 base:hasCanonicalName ?name .
-
             GRAPH ?g {
-                ?mq analysis:characterizes ?component ;
+                ?mq mass-properties-v:isMassOf ?component ;
                     rdfs:label "mass" .
             }
             ?g dc:creator ?creator ;
                 dc:rights ?rights .
+
         }
     """
     
@@ -96,87 +98,12 @@ module Main
         return parse_args(s)
     end
 
-    function is_alive(server)
-        resp = HTTP.get("$server/health")
-        return resp.status == 200
-    end
-
-    function run_query(server, model_id, query)
-       resp = HTTP.post("$server/v0/sparql/$model_id", body = query, headers = Dict("Content-Type" => "application/sparql-query"))
-        if resp.status != 200
-            @error "Query failed: $server/v0/sparql/$model_id"
-            @error "Response: $(resp.status) - $(String(resp.body))"
-            return nothing
-        end
-        return resp
-    end
-
-    function update(server, operations, defer_diagnostics=false)
-        body = Dict("operations" => operations, "deferDiagnostics" => defer_diagnostics)
-        resp = HTTP.post("$server/v0/update", headers=Dict("Content-Type" => "application/json"), body=JSON3.write(body))
-        # open("/tmp/log.txt", "a") do log
-        #     println(log, "Response: ", resp.status, " - ", String(resp.body))
-        # end
-        return resp.status == 200
-    end
-
-    function add_description(namespace, prefix, path)
-        Dict(
-            "createOntology" => Dict(
-                "ontologyKind" => "description",
-                "ontologyNamespace" => namespace,
-                "ontologyPrefix" => prefix,
-                "targetFolder" => path
-            )
-        )
-    end
-
-    function add_import(importing, imported)
-        Dict(
-            "addImport" => Dict(
-                "importingIri" => importing,
-                "importedIri" => imported,
-            )
-        )
-    end
-
-    function add_assertion(description_iri, subject_iri, predicate_iri, object_iri)
-        Dict(
-            "addAssertion" => Dict(
-                "descriptionIri" => description_iri,
-                "subjectIri" => subject_iri,
-                "predicateIri" => predicate_iri,
-                "object" => object_iri
-            )
-        )
-    end
-
-    function add_annotation(ontologyIri, subjectIri, predicateIri, object)
-        Dict(
-            "addAnnotation" => Dict(
-                "ontologyIri" => ontologyIri,
-                "subjectIri" => subjectIri,
-                "predicateIri" => predicateIri,
-                "object" => object
-            )
-        )
-    end
-
     function add_authorization(iri, authorizer)
         add_annotation(iri, iri, DC_CREATOR, Dict("datatypeIri" => "http://www.w3.org/2001/XMLSchema#anyURI", "value" => authorizer))
     end
 
     function add_rights(iri, grantee)
         add_annotation(iri, iri, DC_RIGHTS, Dict("datatypeIri" => "http://www.w3.org/2001/XMLSchema#anyURI", "value" => grantee))
-    end
-
-    function create_instance(description_iri, name)
-        Dict(
-            "createInstance" => Dict(
-                "descriptionIri" => description_iri,
-                "instanceName" => name
-            )
-        )
     end
 
     function (@main)(ARGS)
@@ -232,7 +159,8 @@ module Main
             # Create description.
 
             desc_iri = replace(map["g"], "/Q/" => "/R/")
-            push!(operations, add_description(desc_iri, "$(id)_R", args["path-base"]))
+            push!(operations, delete_ontology(desc_iri))
+            push!(operations, create_ontology("description", desc_iri, "$(id)_R", args["path-base"]))
 
             push!(operations, add_authorization(desc_iri, map["creator"]))
             push!(operations, add_rights(desc_iri, map["rights"]))
@@ -283,7 +211,7 @@ module Main
             push!(operations, add_assertion(desc_iri, mv_iri, RDF_TYPE, MASS_VALUE))
             push!(operations, add_assertion(desc_iri, mc_iri, ANALYZES, mv_iri))
             push!(operations, add_assertion(desc_iri, mv_iri, HAS_NUMBER, Dict("\$type" => "DoubleLiteral", "value" => upper_mass)))
-            push!(operations, add_assertion(desc_iri, mv_iri, HAS_UNIT, KG_UNIT))
+            push!(operations, add_assertion(desc_iri, mv_iri, HAS_REFERENCE, KG_UNIT))
 
             nr = 1
             for c in ["Cx", "Cy", "Cz"]
@@ -337,17 +265,17 @@ module Main
                 cmv_min_name = "$(id)_$(c)_min_value"
                 cmv_min_iri = "$(desc_iri)$separator$cmv_min_name"
                 push!(operations, create_instance(desc_iri, cmv_min_name))
-                push!(operations, add_assertion(desc_iri, cmv_min_iri, RDF_TYPE, LENGTH_VALUE))
+                push!(operations, add_assertion(desc_iri, cmv_min_iri, RDF_TYPE, CENTER_OF_MASS_COORDINATE))
                 push!(operations, add_assertion(desc_iri, cmv_min_iri, HAS_NUMBER, Dict("\$type" => "DoubleLiteral", "value" => cv_lower)))
-                push!(operations, add_assertion(desc_iri, cmv_min_iri, HAS_UNIT, MM_UNIT))
+                push!(operations, add_assertion(desc_iri, cmv_min_iri, HAS_REFERENCE, MM_UNIT))
                 push!(operations, add_assertion(desc_iri, cc_min_iri, ANALYZES, cmv_min_iri))
 
                 cmv_max_name = "$(id)_$(c)_max_value"
                 cmv_max_iri = "$(desc_iri)$separator$cmv_max_name"
                 push!(operations, create_instance(desc_iri, cmv_max_name))
-                push!(operations, add_assertion(desc_iri, cmv_max_iri, RDF_TYPE, LENGTH_VALUE))
+                push!(operations, add_assertion(desc_iri, cmv_max_iri, RDF_TYPE, CENTER_OF_MASS_COORDINATE))
                 push!(operations, add_assertion(desc_iri, cmv_max_iri, HAS_NUMBER, Dict("\$type" => "DoubleLiteral", "value" => cv_upper)))
-                push!(operations, add_assertion(desc_iri, cmv_max_iri, HAS_UNIT, MM_UNIT))
+                push!(operations, add_assertion(desc_iri, cmv_max_iri, HAS_REFERENCE, MM_UNIT))
                 push!(operations, add_assertion(desc_iri, cc_max_iri, ANALYZES, cmv_max_iri))
             
             end
